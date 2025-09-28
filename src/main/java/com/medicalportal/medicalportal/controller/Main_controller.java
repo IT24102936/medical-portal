@@ -22,4 +22,9 @@ public class Main_controller {
         return "pharmacist-dashboard";
     }
 
+    @GetMapping("/labtechnician-dashboard")
+    public String labTechnicianDashboard() {
+        return "lab-technician-dashboard";
+    }
+
 }

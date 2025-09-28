@@ -21,6 +21,10 @@ public class MedicalReport {
     @Column(name = "document_path")
     private String documentPath;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "patient_id", nullable = false)
+    private Patient patient;
+
     public Integer getId() {
         return id;
     }
@@ -51,6 +55,14 @@ public class MedicalReport {
 
     public void setDocumentPath(String documentPath) {
         this.documentPath = documentPath;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
 }

@@ -332,29 +332,25 @@
                         <table class="table table-hover">
                             <thead class="table-info">
                             <tr>
-                                <th>Medication</th>
+                                <th>Inventory ID</th>
                                 <th>Description</th>
                                 <th>Current Stock</th>
-                                <th>Pharmacist ID</th>
-                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             <c:forEach var="item" items="${inventory}">
                                 <tr>
-                                    <td>${item.medicine != null ? item.medicine.name : 'Unknown Medicine'}</td>
+                                    <td>#INV${item.id}</td>
                                     <td>${item.description}</td>
                                     <td>${item.count}</td>
-                                    <td>${item.pharmacist != null ? item.pharmacist.employee.firstName : 'Unknown'} ${item.pharmacist != null ? item.pharmacist.employee.lastName : 'Pharmacist'}</td>
-                                    <td><span class="badge ${item.count <= (item.minLevel != null ? item.minLevel : 10) ? 'bg-danger' : 'bg-success'}">${item.status}</span></td>
                                     <td>
                                         <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editStockModal" 
-                                                data-medicine="${item.medicine != null ? item.medicine.name : 'Unknown Medicine'}" 
+                                                data-description="${item.description}" 
                                                 data-id="${item.id}" 
-                                                data-count="${item.count}">Edit</button>
+                                                data-count="${item.count}">Edit Stock</button>
                                         <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#restockModal" 
-                                                data-medicine="${item.medicine != null ? item.medicine.name : 'Unknown Medicine'}" 
+                                                data-description="${item.description}" 
                                                 data-id="${item.id}" 
                                                 data-count="${item.count}">Restock</button>
                                     </td>
@@ -373,25 +369,12 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">💊 Add New Medicine</h5>
+                    <h5 class="modal-title">💊 Add New Inventory Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="post" action="/pharmacist/inventory/add">
                     <div class="modal-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Medicine Code *</label>
-                                <select class="form-select" name="medicineCode" required>
-                                    <option value="">Select Medicine</option>
-                                    <c:forEach var="medicine" items="${medicines}">
-                                        <option value="${medicine.medicineCode}">${medicine.name} (${medicine.medicineCode})</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Pharmacist ID *</label>
-                                <input type="number" class="form-control" name="pharmacistId" value="1" required>
-                            </div>
                             <div class="col-12">
                                 <label class="form-label fw-bold">Description *</label>
                                 <textarea class="form-control" name="description" rows="3" placeholder="Enter medicine description, usage, and instructions" required></textarea>
@@ -401,12 +384,8 @@
                                 <input type="number" class="form-control" name="stockCount" min="0" placeholder="Enter initial quantity" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Minimum Level *</label>
-                                <input type="number" class="form-control" name="minLevel" min="0" placeholder="Minimum stock alert level" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Expiry Date *</label>
-                                <input type="date" class="form-control" name="expiryDate" required>
+                                <label class="form-label fw-bold">Pharmacist EID *</label>
+                                <input type="number" class="form-control" name="pharmacistEid" value="1" required>
                             </div>
                         </div>
                     </div>
@@ -424,13 +403,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">📦 Restock Medicine</h5>
+                    <h5 class="modal-title">📦 Restock Inventory Item</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="post" action="/pharmacist/inventory/restock">
                     <div class="modal-body">
                         <div class="alert alert-info">
-                            <h6 class="fw-bold mb-2">Medicine Information</h6>
+                            <h6 class="fw-bold mb-2">Inventory Item Information</h6>
                             <div id="restockMedicineInfo"></div>
                         </div>
                         <input type="hidden" id="restockInventoryId" name="inventoryId">
@@ -466,6 +445,16 @@
                             <label class="form-label fw-bold">Prescription ID</label>
                             <input type="text" class="form-control" id="viewPrescriptionId" readonly>
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Status</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="fulfilledStatus" disabled>
+                                <label class="form-check-label fw-bold text-success" for="fulfilledStatus">
+                                    ✅ Mark as Fulfilled
+                                </label>
+                                <small class="d-block text-muted">Future functionality - not yet connected to backend</small>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">Description</label>
                             <textarea class="form-control" id="viewPrescriptionDesc" rows="4" readonly></textarea>
@@ -474,6 +463,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form method="post" id="deletePrescriptionForm" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this prescription? This action cannot be undone.')">
+                        <button type="submit" class="btn btn-danger">
+                            <span class="material-symbols-outlined me-1" style="font-size: 16px;">delete</span>
+                            Delete Prescription
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -484,13 +479,13 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">✏️ Edit Medicine Stock</h5>
+                    <h5 class="modal-title">✏️ Edit Inventory Stock</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="post" action="/pharmacist/inventory/reduce">
                     <div class="modal-body">
                         <div class="alert alert-warning">
-                            <h6 class="fw-bold mb-2">Medicine Information</h6>
+                            <h6 class="fw-bold mb-2">Inventory Item Information</h6>
                             <div id="editMedicineInfo"></div>
                         </div>
                         <input type="hidden" id="editInventoryId" name="inventoryId">
@@ -575,6 +570,10 @@
 
                     document.getElementById('viewPrescriptionId').value = '#RX' + prescriptionId;
                     document.getElementById('viewPrescriptionDesc').value = prescriptionDesc;
+                    
+                    // Set up delete form action
+                    const deleteForm = document.getElementById('deletePrescriptionForm');
+                    deleteForm.action = '/pharmacist/prescription/delete/' + prescriptionId;
                 });
             }
 
@@ -584,13 +583,13 @@
                 restockModal.addEventListener('show.bs.modal', function (event) {
                     const button = event.relatedTarget;
                     const medicineId = button.getAttribute('data-id');
-                    const medicineName = button.getAttribute('data-medicine');
+                    const description = button.getAttribute('data-description');
                     const currentStock = button.getAttribute('data-count');
 
                     document.getElementById('restockInventoryId').value = medicineId;
                     document.getElementById('currentStock').value = currentStock;
                     document.getElementById('restockMedicineInfo').innerHTML =
-                        '<strong>Medicine:</strong> ' + medicineName + '<br><strong>Current Stock:</strong> ' + currentStock;
+                        '<strong>Item:</strong> ' + description + '<br><strong>Current Stock:</strong> ' + currentStock;
                 });
             }
 
@@ -600,13 +599,13 @@
                 editStockModal.addEventListener('show.bs.modal', function (event) {
                     const button = event.relatedTarget;
                     const medicineId = button.getAttribute('data-id');
-                    const medicineName = button.getAttribute('data-medicine');
+                    const description = button.getAttribute('data-description');
                     const currentStock = button.getAttribute('data-count');
 
                     document.getElementById('editInventoryId').value = medicineId;
                     document.getElementById('editCurrentStock').value = currentStock;
                     document.getElementById('editMedicineInfo').innerHTML =
-                        '<strong>Medicine:</strong> ' + medicineName + '<br><strong>Current Stock:</strong> ' + currentStock;
+                        '<strong>Item:</strong> ' + description + '<br><strong>Current Stock:</strong> ' + currentStock;
                 });
             }
         });

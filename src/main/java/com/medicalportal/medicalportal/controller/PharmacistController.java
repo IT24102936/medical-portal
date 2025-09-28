@@ -5,6 +5,9 @@ import com.medicalportal.medicalportal.entity.MedicineInventory;
 import com.medicalportal.medicalportal.entity.Medicine;
 import com.medicalportal.medicalportal.entity.Pharmacist;
 import com.medicalportal.medicalportal.entity.Prescription;
+import com.medicalportal.medicalportal.entity.Employee;
+import com.medicalportal.medicalportal.repository.EmployeeRepository;
+import com.medicalportal.medicalportal.repository.PharmacistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +27,24 @@ public class PharmacistController {
     @Autowired
     private PharmacistServices pharmacistServices;
 
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private PharmacistRepository pharmacistRepository;
+
     @GetMapping
     public String showDashboard(Model model) {
+        // Initialize pharmacist record if it doesn't exist
+        initializePharmacistRecord();
         
+        // Initialize sample data if database is empty
+        if (pharmacistServices.getTotalPrescriptionsCount() == 0) {
+            initializeSamplePrescriptions();
+        }
+        if (pharmacistServices.getTotalInventoryItems() == 0) {
+            initializeSampleInventory();
+        }
        
         List<Prescription> prescriptions = pharmacistServices.getAllPrescriptions();
         List<MedicineInventory> inventory = pharmacistServices.getAllMedicineInventory();
@@ -79,29 +98,17 @@ public class PharmacistController {
     // Add new medicine to inventory
     @PostMapping("/inventory/add")
     public String addMedicineToInventory(
-            @RequestParam String medicineCode,
             @RequestParam String description,
             @RequestParam Integer stockCount,
-            @RequestParam Integer minLevel,
-            @RequestParam String expiryDate,
-            @RequestParam Integer pharmacistId,
+            @RequestParam Integer pharmacistEid,
             RedirectAttributes redirectAttributes) {
         try {
             // Create new inventory item
             MedicineInventory inventory = new MedicineInventory();
             inventory.setDescription(description);
             inventory.setCount(stockCount);
-            inventory.setMinLevel(minLevel);
-            inventory.setExpiryDate(LocalDate.parse(expiryDate));
-            inventory.setStatus(stockCount > minLevel ? "In Stock" : "Low Stock");
-
-            // Get medicine and pharmacist
-            Medicine medicine = pharmacistServices.getMedicineByCode(medicineCode);
-            Pharmacist pharmacist = pharmacistServices.getPharmacistById(pharmacistId).orElse(null);
-
-            inventory.setMedicine(medicine);
-            inventory.setPharmacist(pharmacist);
-
+           // inventory.setPharmacistEid(pharmacistEid);
+            
             pharmacistServices.addMedicineToInventory(inventory);
             redirectAttributes.addFlashAttribute("successMessage", "Medicine added to inventory successfully.");
         } catch (Exception e) {
@@ -180,6 +187,25 @@ public class PharmacistController {
     public Prescription getPrescription(@PathVariable Integer id) {
         return pharmacistServices.getPrescriptionById(id);
     }
+    
+    // Delete prescription
+    @PostMapping("/prescription/delete/{id}")
+    public String deletePrescription(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            boolean deleted = pharmacistServices.deletePrescription(id);
+            if (deleted) {
+                redirectAttributes.addFlashAttribute("successMessage", 
+                        "Prescription #RX" + id + " deleted successfully.");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", 
+                        "Prescription not found or could not be deleted.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                    "Failed to delete prescription: " + e.getMessage());
+        }
+        return "redirect:/pharmacist";
+    }
 
     // Navigate to prescriptions page
     @GetMapping("/prescriptions")
@@ -193,6 +219,103 @@ public class PharmacistController {
     @ResponseBody
     public MedicineInventory getInventoryItem(@PathVariable Integer id) {
         return pharmacistServices.getInventoryItemById(id);
+    }
+    
+    // Initialize sample prescription data for demonstration
+    private void initializeSamplePrescriptions() {
+        // Create sample prescriptions
+        Prescription prescription1 = new Prescription();
+        prescription1.setDescription("Aspirin 81mg, take one tablet daily with food for 30 days.");
+        pharmacistServices.addPrescription(prescription1);
+        
+        Prescription prescription2 = new Prescription();
+        prescription2.setDescription("Lisinopril 10mg, take one tablet daily in the morning.");
+        pharmacistServices.addPrescription(prescription2);
+        
+        Prescription prescription3 = new Prescription();
+        prescription3.setDescription("Metformin 500mg, take one tablet twice daily with meals.");
+        pharmacistServices.addPrescription(prescription3);
+        
+        Prescription prescription4 = new Prescription();
+        prescription4.setDescription("Amoxicillin 250mg, take one capsule three times daily for 7 days.");
+        pharmacistServices.addPrescription(prescription4);
+        
+        Prescription prescription5 = new Prescription();
+        prescription5.setDescription("Ibuprofen 200mg, take 1-2 tablets every 4-6 hours as needed for pain.");
+        pharmacistServices.addPrescription(prescription5);
+    }
+    
+    // Initialize sample inventory data for demonstration
+    private void initializeSampleInventory() {
+        try {
+            // Create sample inventory items with simplified structure
+            MedicineInventory inventory1 = new MedicineInventory();
+            inventory1.setDescription("Pain relief medication - Over the counter aspirin tablets");
+            inventory1.setCount(150);
+            inventory1.setPharmacistEid(1);
+            pharmacistServices.addMedicineToInventory(inventory1);
+            
+            MedicineInventory inventory2 = new MedicineInventory();
+            inventory2.setDescription("Blood pressure medication - Lisinopril tablets");
+            inventory2.setCount(8);
+            inventory2.setPharmacistEid(1);
+            pharmacistServices.addMedicineToInventory(inventory2);
+            
+            MedicineInventory inventory3 = new MedicineInventory();
+            inventory3.setDescription("Diabetes medication - Metformin tablets");
+            inventory3.setCount(75);
+            inventory3.setPharmacistEid(1);
+            pharmacistServices.addMedicineToInventory(inventory3);
+            
+            MedicineInventory inventory4 = new MedicineInventory();
+            inventory4.setDescription("Antibiotic - Amoxicillin capsules");
+            inventory4.setCount(45);
+            inventory4.setPharmacistEid(1);
+            pharmacistServices.addMedicineToInventory(inventory4);
+            
+        } catch (Exception e) {
+            // Log error but don't break the application
+            System.err.println("Error initializing sample inventory: " + e.getMessage());
+        }
+    }
+    
+    // Initialize pharmacist record if it doesn't exist
+    private void initializePharmacistRecord() {
+        try {
+            // Check if pharmacist with EID 1 exists
+            if (!pharmacistRepository.existsById(1)) {
+                // First check if employee with EID 1 exists
+                Employee employee = employeeRepository.findById(1).orElse(null);
+                
+                if (employee == null) {
+                    // Create employee record first
+                    employee = new Employee();
+                    employee.setId(1); // Set EID to 1
+                    employee.setFirstName("John");
+                    employee.setLastName("Smith");
+                    employee.setNationalId("NID001");
+                    employee.setGender("Male");
+                    employee.setDob(LocalDate.of(1985, 6, 15));
+                    employee.setEmail("john.smith@medisphere.com");
+                    employee.setPassword("password123");
+                    employee.setUserName("jsmith");
+                    employee.setSalary(new BigDecimal("75000.00"));
+                    
+                    employee = employeeRepository.save(employee);
+                }
+                
+                // Create pharmacist record
+                Pharmacist pharmacist = new Pharmacist();
+                pharmacist.setId(1); // Set EID to 1 to match employee
+                pharmacist.setEmployee(employee);
+                
+                pharmacistRepository.save(pharmacist);
+                
+                System.out.println("Initialized pharmacist record with EID: 1");
+            }
+        } catch (Exception e) {
+            System.err.println("Error initializing pharmacist record: " + e.getMessage());
+        }
     }
 }
     

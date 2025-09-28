@@ -56,12 +56,6 @@ public class PharmacistServices {
         if (inventoryOpt.isPresent()) {
             MedicineInventory inventory = inventoryOpt.get();
             inventory.setCount(newCount);
-            // Update status based on stock level
-            if (inventory.isLowStock()) {
-                inventory.setStatus("Low Stock");
-            } else {
-                inventory.setStatus("In Stock");
-            }
             medicineInventoryRepository.save(inventory);
         }
     }
@@ -92,12 +86,6 @@ public class PharmacistServices {
         if (inventoryOpt.isPresent()) {
             MedicineInventory inventory = inventoryOpt.get();
             inventory.setCount(inventory.getCount() + additionalStock);
-            // Update status based on stock level
-            if (inventory.isLowStock()) {
-                inventory.setStatus("Low Stock");
-            } else {
-                inventory.setStatus("In Stock");
-            }
             medicineInventoryRepository.save(inventory);
         }
     }
@@ -109,15 +97,6 @@ public class PharmacistServices {
             MedicineInventory inventory = inventoryOpt.get();
             int newCount = Math.max(0, inventory.getCount() - reductionAmount);
             inventory.setCount(newCount);
-            
-            // Update status based on stock level
-            if (newCount == 0) {
-                inventory.setStatus("Out of Stock");
-            } else if (inventory.isLowStock()) {
-                inventory.setStatus("Low Stock");
-            } else {
-                inventory.setStatus("In Stock");
-            }
             
             // Update description to include reduction reason
             if (reason != null && !reason.isEmpty()) {
@@ -145,6 +124,19 @@ public class PharmacistServices {
     // Get prescription by ID
     public Prescription getPrescriptionById(Integer id) {
         return prescriptionRepository.findById(id).orElse(null);
+    }
+
+    // Delete prescription by ID
+    public boolean deletePrescription(Integer id) {
+        try {
+            if (prescriptionRepository.existsById(id)) {
+                prescriptionRepository.deleteById(id);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // Get inventory item by ID
