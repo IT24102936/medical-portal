@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +13,149 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="../../resources/static/css/lab-technician-dashboard.css">
+    <link rel="stylesheet" href="/css/lab-technician-dashboard.css">
+    <style>
+        /* Fallback styles for lab technician dashboard */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+            min-height: 100vh;
+        }
+        .text-dark-blue {
+            color: #0d171b !important;
+        }
+        .dashboard-main {
+            background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 50%, #bbdefb 100%);
+            padding-bottom: 2rem;
+        }
+        .welcome-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(19, 164, 236, 0.1);
+            position: relative;
+        }
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #13a4ec, #0b8acb);
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(19, 164, 236, 0.05);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #13a4ec;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #0d171b;
+            text-align: center;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            border: 1px solid rgba(19, 164, 236, 0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        .dashboard-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(19, 164, 236, 0.15);
+            border-color: #13a4ec;
+        }
+        .dashboard-card .card-header {
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            border-bottom: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .dashboard-card .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dashboard-card .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0d171b;
+        }
+        .dashboard-card .card-body {
+            padding: 0 1.5rem 1rem 1.5rem;
+        }
+        .dashboard-card .card-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .dashboard-card .card-stats {
+            margin-bottom: 0;
+        }
+        .dashboard-card .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .dashboard-card .stat-row:last-child {
+            border-bottom: none;
+        }
+        .dashboard-card .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        .dashboard-card .stat-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .dashboard-card .card-footer {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            background: rgba(19, 164, 236, 0.03);
+            border-top: 1px solid rgba(19, 164, 236, 0.1);
+        }
+        .dashboard-card .action-text {
+            color: #13a4ec;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        .btn-primary {
+            background-color: #13a4ec !important;
+            border-color: #13a4ec !important;
+        }
+        .btn-primary:hover {
+            background-color: #0b8acb !important;
+            border-color: #0b8acb !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(19, 164, 236, 0.3);
+        }
+    </style>
 </head>
 <body>
 
@@ -35,11 +178,11 @@
                         <span class="d-none d-md-inline">Sarah Johnson</span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="showProfile()">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
                             <span class="material-symbols-outlined me-2">person</span>View Profile
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()">
+                        <li><a class="dropdown-item text-danger" href="/logout">
                             <span class="material-symbols-outlined me-2">logout</span>Logout
                         </a></li>
                     </ul>
@@ -52,6 +195,20 @@
 <main class="dashboard-main">
     <div class="container-fluid px-4 py-4">
 
+        <!-- Flash Messages -->
+        <c:if test="${not empty successMessage}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ${successMessage}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </c:if>
+        <c:if test="${not empty errorMessage}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ${errorMessage}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </c:if>
+
         <!-- Welcome Section -->
         <div class="row mb-4">
             <div class="col-12">
@@ -60,16 +217,16 @@
                     <p class="lead text-secondary mb-3">Manage laboratory operations and test processing efficiently</p>
                     <div class="d-flex flex-wrap gap-3">
                         <div class="stat-item">
-                            <span class="stat-number">18</span>
-                            <span class="stat-label">Pending Tests</span>
+                            <span class="stat-number">${totalPendingOrders}</span>
+                            <span class="stat-label">Pending Orders</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">32</span>
-                            <span class="stat-label">Tests in Progress</span>
+                            <span class="stat-number">${totalOrdersToday}</span>
+                            <span class="stat-label">Orders Today</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">95%</span>
-                            <span class="stat-label">Equipment Ready</span>
+                            <span class="stat-number">${totalReports}</span>
+                            <span class="stat-label">Medical Reports</span>
                         </div>
                     </div>
                 </div>
@@ -81,7 +238,7 @@
 
             <!-- Lab Technician Profile Card -->
             <div class="col-lg-6 col-xl-4">
-                <div class="dashboard-card h-100" onclick="showProfile()">
+                <div class="dashboard-card h-100" data-bs-toggle="modal" data-bs-target="#profileModal" style="cursor: pointer;">
                     <div class="card-header">
                         <div class="icon-wrapper bg-primary">
                             <span class="material-symbols-outlined">person</span>
@@ -102,14 +259,14 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <span class="action-text">Manage Profile →</span>
+                        <span class="action-text">👆 Click to Manage Profile →</span>
                     </div>
                 </div>
             </div>
 
             <!-- Doctor Orders Card -->
             <div class="col-lg-6 col-xl-4">
-                <div class="dashboard-card h-100" onclick="showDoctorOrders()">
+                <div class="dashboard-card h-100" data-bs-toggle="modal" data-bs-target="#doctorOrdersModal" style="cursor: pointer;">
                     <div class="card-header">
                         <div class="icon-wrapper bg-success">
                             <span class="material-symbols-outlined">medical_information</span>
@@ -120,49 +277,48 @@
                         <p class="card-description">View and process lab test orders received from doctors</p>
                         <div class="card-stats">
                             <div class="stat-row">
-                                <span class="stat-label">Pending:</span>
-                                <span class="stat-value text-warning">12</span>
+                                <span class="stat-label">Total Orders:</span>
+                                <span class="stat-value text-warning">${totalPendingOrders}</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">Completed Today:</span>
-                                <span class="stat-value text-success">24</span>
+                                <span class="stat-label">Today:</span>
+                                <span class="stat-value text-success">${totalOrdersToday}</span>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <span class="action-text">View Doctor Orders →</span>
+                        <span class="action-text">👆 Click to View Doctor Orders →</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Patient Orders Card -->
+            <!-- Medical Reports Card -->
             <div class="col-lg-6 col-xl-4">
-                <div class="dashboard-card h-100" onclick="showPatientOrders()">
+                <div class="dashboard-card h-100" data-bs-toggle="modal" data-bs-target="#medicalReportsModal" style="cursor: pointer;">
                     <div class="card-header">
                         <div class="icon-wrapper bg-info">
-                            <span class="material-symbols-outlined">patient_list</span>
+                            <span class="material-symbols-outlined">description</span>
                         </div>
-                        <h3 class="card-title">👥 Patient Orders</h3>
+                        <h3 class="card-title">📄 Lab Reports</h3>
                     </div>
                     <div class="card-body">
-                        <p class="card-description">Manage lab test bookings submitted directly by patients</p>
+                        <p class="card-description">Manage medical reports and upload drive links for patient records</p>
                         <div class="card-stats">
                             <div class="stat-row">
-                                <span class="stat-label">New Bookings:</span>
-                                <span class="stat-value text-info">6</span>
+                                <span class="stat-label">Total Reports:</span>
+                                <span class="stat-value text-info">${totalReports}</span>
                             </div>
                             <div class="stat-row">
-                                <span class="stat-label">In Progress:</span>
-                                <span class="stat-value text-warning">8</span>
+                                <span class="stat-label">Today:</span>
+                                <span class="stat-value text-primary">${reportsToday}</span>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
-                        <span class="action-text">View Patient Orders →</span>
+                        <span class="action-text">👆 Click to Manage Lab Reports →</span>
                     </div>
                 </div>
             </div>
-        </div>
 
     </div>
 </main>
@@ -196,8 +352,8 @@
                 <h5 class="modal-title">👩‍🔬 Lab Technician Profile</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="profileForm">
+            <form method="post" action="/lab-technician/profile/update">
+                <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Employee ID</label>
@@ -211,27 +367,27 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">First Name</label>
-                            <input type="text" class="form-control" id="firstName" value="Sarah">
+                            <input type="text" class="form-control" name="firstName" value="Sarah" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Last Name</label>
-                            <input type="text" class="form-control" id="lastName" value="Johnson">
+                            <input type="text" class="form-control" name="lastName" value="Johnson" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">Address</label>
-                            <textarea class="form-control" id="address" rows="3">789 Laboratory Avenue, Science District, City, State 12345</textarea>
+                            <textarea class="form-control" name="address" rows="3" required>789 Laboratory Avenue, Science District, City, State 12345</textarea>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Contact Number</label>
-                            <input type="tel" class="form-control" id="contactNumber" value="(+94) 77 123 4567">
+                            <input type="tel" class="form-control" name="contactNumber" value="(+94) 77 123 4567" required>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -245,125 +401,41 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Search and Filter Controls -->
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="input-group">
-                                <span class="input-group-text">
-                                    <span class="material-symbols-outlined">search</span>
-                                </span>
-                            <input type="text" class="form-control" placeholder="Search by patient name..." id="doctorSearchInput">
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" id="doctorTestTypeFilter">
-                            <option value="">All Test Types</option>
-                            <option value="Blood Tests">Blood Tests</option>
-                            <option value="Urine Analysis">Urine Analysis</option>
-                            <option value="Microbiology">Microbiology</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" id="doctorPriorityFilter">
-                            <option value="">All Priorities</option>
-                            <option value="Urgent">Urgent</option>
-                            <option value="Normal">Normal</option>
-                            <option value="Routine">Routine</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-secondary w-100" onclick="clearDoctorFilters()">Clear</button>
-                    </div>
-                </div>
-
                 <div class="table-responsive">
                     <table class="table table-hover" id="doctorOrdersTable">
                         <thead class="table-success">
                         <tr>
-                            <th>Order ID</th>
+                            <th>Lab Order ID</th>
                             <th>Patient Name</th>
-                            <th>Doctor</th>
-                            <th>Test Type</th>
-                            <th>Priority</th>
-                            <th>Status</th>
+                            <th>Doctor ID</th>
+                            <th>Test Description</th>
+                            <th>Issue Date</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr data-patient="Emily Wilson" data-test="Blood Tests" data-priority="Urgent">
-                            <td>#DOC001</td>
-                            <td>Emily Wilson</td>
-                            <td>Dr. Anderson</td>
-                            <td>Complete Blood Count</td>
-                            <td><span class="badge bg-danger">Urgent</span></td>
-                            <td><span class="badge bg-warning">Pending</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-success me-1" onclick="acceptOrder('DOC001', 'doctor')">Accept</button>
-                                <button class="btn btn-sm btn-primary me-1" onclick="submitResults('DOC001', 'doctor')" style="display: none;">📊 Submit Results</button>
-                            </td>
-                        </tr>
-                        <tr data-patient="Michael Brown" data-test="Urine Analysis" data-priority="Normal">
-                            <td>#DOC002</td>
-                            <td>Michael Brown</td>
-                            <td>Dr. Martinez</td>
-                            <td>Urine Analysis</td>
-                            <td><span class="badge bg-info">Normal</span></td>
-                            <td><span class="badge bg-info">In Progress</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="submitResults('DOC002', 'doctor')">📊 Submit Results</button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Patient Orders Modal -->
-<div class="modal fade" id="patientOrdersModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">👥 Patient Test Orders Management</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="patientOrdersTable">
-                        <thead class="table-info">
-                        <tr>
-                            <th>Booking ID</th>
-                            <th>Patient Name</th>
-                            <th>Contact</th>
-                            <th>Selected Tests</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr data-patient="John Doe" data-test="Blood Tests" data-status="New">
-                            <td>#LAB-123456</td>
-                            <td>John Doe <small class="text-muted">(M, 35)</small></td>
-                            <td>(+94) 77 123 4567</td>
-                            <td>Complete Blood Count, Lipid Panel</td>
-                            <td><span class="badge bg-primary">New</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-success me-1" onclick="acceptOrder('LAB-123456', 'patient')">Assign</button>
-                                <button class="btn btn-sm btn-primary me-1" onclick="submitResults('LAB-123456', 'patient')" style="display: none;">📊 Submit Results</button>
-                            </td>
-                        </tr>
-                        <tr data-patient="Jane Smith" data-test="Thyroid Function" data-status="In Progress">
-                            <td>#LAB-123457</td>
-                            <td>Jane Smith <small class="text-muted">(F, 28)</small></td>
-                            <td>(+94) 71 987 6543</td>
-                            <td>Thyroid Function Test</td>
-                            <td><span class="badge bg-warning">In Progress</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="submitResults('LAB-123457', 'patient')">📊 Submit Results</button>
-                            </td>
-                        </tr>
+                        <c:forEach var="order" items="${doctorOrders}">
+                            <tr>
+                                <td>#${order.labOrder.id}</td>
+                                <td>${order.patient.firstName} ${order.patient.lastName}</td>
+                                <td>Dr. ${order.doctorEid.id}</td>
+                                <td>${order.labOrder.description}</td>
+                                <td>${order.issueDate}</td>
+                                <td>
+                                    <form method="post" action="/lab-technician/order/accept" style="display: inline;">
+                                        <input type="hidden" name="doctorEid" value="${order.doctorEid.id}">
+                                        <input type="hidden" name="labOrderId" value="${order.labOrder.id}">
+                                        <input type="hidden" name="patientId" value="${order.patient.id}">
+                                        <button type="submit" class="btn btn-sm btn-success me-1">Accept</button>
+                                    </form>
+                                    <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#resultsModal" 
+                                            data-doctor-eid="${order.doctorEid.id}" 
+                                            data-lab-order-id="${order.labOrder.id}" 
+                                            data-patient-id="${order.patient.id}"
+                                            data-description="${order.labOrder.description}">📊 Submit Results</button>
+                                </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </div>
@@ -380,8 +452,8 @@
                 <h5 class="modal-title">📊 Submit Lab Results</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="resultsForm" enctype="multipart/form-data">
+            <form method="post" action="/lab-technician/order/submit-results" id="resultsForm">
+                <div class="modal-body">
                     <div class="row g-3">
                         <div class="col-12">
                             <div class="alert alert-info">
@@ -389,30 +461,139 @@
                                 <div id="testInfo"></div>
                             </div>
                         </div>
-
-                        <!-- File Upload Area -->
+                        
+                        <input type="hidden" name="doctorEid" id="hiddenDoctorEid">
+                        <input type="hidden" name="labOrderId" id="hiddenLabOrderId">
+                        <input type="hidden" name="patientId" id="hiddenPatientId">
+                        
                         <div class="col-12">
-                            <label class="form-label fw-bold">📎 Upload Lab Result Files</label>
-                            <div class="upload-area" id="uploadArea">
-                                <div class="upload-content">
-                                    <span class="material-symbols-outlined upload-icon">cloud_upload</span>
-                                    <p class="upload-text">Drag and drop lab result files here or click to upload</p>
-                                    <p class="upload-hint">(PDF, JPG, JPEG, PNG files allowed - Max 10MB)</p>
-                                </div>
-                                <input type="file" id="fileInput" name="resultFiles" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;">
-                            </div>
-                            <div class="upload-success" id="uploadSuccess" style="display: none;">
-                                <span class="material-symbols-outlined success-icon">check_circle</span>
-                                <span class="success-text">Files selected successfully!</span>
-                                <div id="fileList" class="file-list"></div>
-                            </div>
+                            <label class="form-label fw-bold">Lab Results</label>
+                            <textarea class="form-control" name="results" rows="4" 
+                                     placeholder="Enter detailed lab results..." required></textarea>
                         </div>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Results</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Medical Reports Modal -->
+<div class="modal fade" id="medicalReportsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📄 Medical Reports Management</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveResults()">Submit Results</button>
+            <div class="modal-body">
+                <!-- Add New Report Section -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">➕ Submit New Medical Report</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/lab-technician/medical-report/submit" id="medicalReportForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Report Type</label>
+                                    <select class="form-select" name="reportType" required>
+                                        <option value="">Select Report Type</option>
+                                        <option value="Blood Test">Blood Test</option>
+                                        <option value="Urine Analysis">Urine Analysis</option>
+                                        <option value="X-Ray">X-Ray</option>
+                                        <option value="MRI Scan">MRI Scan</option>
+                                        <option value="CT Scan">CT Scan</option>
+                                        <option value="ECG">ECG</option>
+                                        <option value="Ultrasound">Ultrasound</option>
+                                        <option value="Pathology">Pathology</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Patient</label>
+                                    <select class="form-select" name="patientId" required>
+                                        <option value="">Select Patient</option>
+                                        <c:forEach var="patient" items="${patients}">
+                                            <option value="${patient.id}">${patient.firstName} ${patient.lastName} (ID: ${patient.id})</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Document Link (Google Drive/Cloud Storage)</label>
+                                    <input type="url" class="form-control" name="documentPath" 
+                                           placeholder="https://drive.google.com/file/d/..." required>
+                                    <small class="text-muted">Please provide a shareable Google Drive link or other cloud storage URL</small>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="material-symbols-outlined me-2">upload</span>
+                                        Submit Report
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing Reports Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">📁 Existing Medical Reports</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="medicalReportsTable">
+                                <thead class="table-info">
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>Patient Name</th>
+                                    <th>Report Type</th>
+                                    <th>Report Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <c:forEach var="report" items="${medicalReports}">
+                                    <tr>
+                                        <td>#${report.id}</td>
+                                        <td>${report.patient.firstName} ${report.patient.lastName}</td>
+                                        <td>
+                                            <span class="badge bg-info">${report.reportType}</span>
+                                        </td>
+                                        <td>${report.reportDate}</td>
+                                        <td>
+                                            <a href="${report.documentPath}" target="_blank" class="btn btn-sm btn-success me-1">
+                                                <span class="material-symbols-outlined">visibility</span>
+                                                View
+                                            </a>
+                                            <form method="post" action="/lab-technician/medical-report/delete/${report.id}" 
+                                                  style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                                <button type="submit" class="btn btn-sm btn-danger">
+                                                    <span class="material-symbols-outlined">delete</span>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty medicalReports}">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <span class="material-symbols-outlined d-block mb-2" style="font-size: 3rem;">description</span>
+                                            No medical reports found. Submit a new report above.
+                                        </td>
+                                    </tr>
+                                </c:if>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -420,215 +601,119 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function showProfile() {
-        new bootstrap.Modal(document.getElementById('profileModal')).show();
-    }
-
-    function showDoctorOrders() {
-        new bootstrap.Modal(document.getElementById('doctorOrdersModal')).show();
-    }
-
-    function showPatientOrders() {
-        new bootstrap.Modal(document.getElementById('patientOrdersModal')).show();
-    }
-
-    function updateProfile() {
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
-        alert('Profile updated successfully!\nName: ' + firstName + ' ' + lastName);
-        bootstrap.Modal.getInstance(document.getElementById('profileModal')).hide();
-    }
-
-    function logout() {
-        if (confirm('Are you sure you want to logout?')) {
-            alert('Logging out...');
-        }
-    }
-
-    function acceptOrder(orderId, orderType) {
-        const tableId = orderType === 'doctor' ? 'doctorOrdersTable' : 'patientOrdersTable';
-        const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-
-        rows.forEach(row => {
-            if (row.cells[0].textContent.includes(orderId)) {
-                const statusBadge = row.querySelector('.badge:not(.bg-danger):not(.bg-info)');
-                const acceptBtn = row.querySelector('button[onclick*="acceptOrder"]');
-                const submitBtn = row.querySelector('button[onclick*="submitResults"]');
-
-                if (statusBadge) {
-                    statusBadge.className = orderType === 'doctor' ? 'badge bg-info' : 'badge bg-warning';
-                    statusBadge.textContent = 'In Progress';
-                }
-
-                if (acceptBtn) acceptBtn.style.display = 'none';
-                if (submitBtn) submitBtn.style.display = 'inline-block';
-            }
-        });
-
-        alert(`Order ${orderId} has been accepted and is now in progress.`);
-    }
-
-    function submitResults(orderId, orderType) {
-        const testInfoDiv = document.getElementById('testInfo');
-        testInfoDiv.innerHTML = `
-                <strong>Order ID:</strong> #${orderId}<br>
-                <strong>Order Type:</strong> ${orderType === 'doctor' ? 'Doctor Referral' : 'Patient Booking'}
-            `;
-
-        document.getElementById('resultsForm').dataset.orderId = orderId;
-        document.getElementById('resultsForm').dataset.orderType = orderType;
-
-        new bootstrap.Modal(document.getElementById('resultsModal')).show();
-    }
-
-    function saveResults() {
-        const form = document.getElementById('resultsForm');
-        const orderId = form.dataset.orderId;
-        const orderType = form.dataset.orderType;
-
-        const testResult = document.getElementById('testResult').value;
-        const detailedResults = document.getElementById('detailedResults').value;
-        const fileInput = document.getElementById('fileInput');
-
-        if (!testResult || !detailedResults) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        // Check if files are uploaded
-        const hasFiles = fileInput.files.length > 0;
-        let fileInfo = '';
-        if (hasFiles) {
-            const fileNames = Array.from(fileInput.files).map(file => file.name).join(', ');
-            fileInfo = `\nUploaded files: ${fileNames}`;
-        }
-
-        // Update order status to completed
-        const tableId = orderType === 'doctor' ? 'doctorOrdersTable' : 'patientOrdersTable';
-        const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-
-        rows.forEach(row => {
-            if (row.cells[0].textContent.includes(orderId)) {
-                const statusBadge = row.querySelector('.badge:not(.bg-danger):not(.bg-info)');
-                if (statusBadge) {
-                    statusBadge.className = 'badge bg-success';
-                    statusBadge.textContent = 'Completed';
-                }
-
-                const actionsCell = row.cells[row.cells.length - 1];
-                actionsCell.innerHTML = '<button class="btn btn-sm btn-outline-success">View Results</button>';
-            }
-        });
-
-        alert(`Results for order ${orderId} have been submitted successfully!${fileInfo}`);
-        bootstrap.Modal.getInstance(document.getElementById('resultsModal')).hide();
-        form.reset();
-    }
-
-    function clearDoctorFilters() {
-        document.getElementById('doctorSearchInput').value = '';
-        document.getElementById('doctorTestTypeFilter').value = '';
-        document.getElementById('doctorPriorityFilter').value = '';
-    }
-
-    // Add interactive animations
     document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.dashboard-card');
-        cards.forEach((card, index) => {
-            card.style.animationDelay = (index * 0.1) + 's';
-            card.classList.add('fade-in-up');
-        });
-
-        // File upload functionality
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const uploadSuccess = document.getElementById('uploadSuccess');
-        const fileList = document.getElementById('fileList');
-        let selectedFiles = [];
-
-        // Click to upload
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('drag-over');
-        });
-
-        uploadArea.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('drag-over');
-            const files = Array.from(e.dataTransfer.files);
-            handleFileSelection(files);
-        });
-
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            handleFileSelection(files);
-        });
-
-        function handleFileSelection(files) {
-            // Filter valid files
-            const validFiles = files.filter(file => {
-                const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-                const maxSize = 10 * 1024 * 1024; // 10MB
-                return validTypes.includes(file.type) && file.size <= maxSize;
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
             });
+        }, 5000);
 
-            if (validFiles.length > 0) {
-                selectedFiles = validFiles;
-                displaySelectedFiles();
-                uploadArea.style.display = 'none';
-                uploadSuccess.style.display = 'block';
-            } else {
-                alert('Please select valid files (PDF, JPG, JPEG, PNG) under 10MB.');
-            }
-        }
+        // Handle results modal data population
+        const resultsModal = document.getElementById('resultsModal');
+        if (resultsModal) {
+            resultsModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const doctorEid = button.getAttribute('data-doctor-eid');
+                const labOrderId = button.getAttribute('data-lab-order-id');
+                const patientId = button.getAttribute('data-patient-id');
+                const description = button.getAttribute('data-description');
 
-        function displaySelectedFiles() {
-            fileList.innerHTML = '';
-            selectedFiles.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                        <span class="material-symbols-outlined">description</span>
-                        <span class="file-name">${file.name}</span>
-                        <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                        <button type="button" class="remove-file" onclick="removeFile(${index})">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    `;
-                fileList.appendChild(fileItem);
+                // Populate hidden fields
+                document.getElementById('hiddenDoctorEid').value = doctorEid;
+                document.getElementById('hiddenLabOrderId').value = labOrderId;
+                document.getElementById('hiddenPatientId').value = patientId;
+
+                // Update test info display
+                document.getElementById('testInfo').innerHTML = 
+                    '<strong>Lab Order ID:</strong> #' + labOrderId + '<br>' +
+                    '<strong>Test Description:</strong> ' + description + '<br>' +
+                    '<strong>Doctor ID:</strong> ' + doctorEid + '<br>' +
+                    '<strong>Patient ID:</strong> ' + patientId;
             });
         }
 
-        // Make removeFile function global
-        window.removeFile = function(index) {
-            selectedFiles.splice(index, 1);
-            if (selectedFiles.length === 0) {
-                uploadArea.style.display = 'block';
-                uploadSuccess.style.display = 'none';
-                fileInput.value = '';
-            } else {
-                displaySelectedFiles();
-            }
+        // Handle medical report form submission with validation
+        const medicalReportForm = document.getElementById('medicalReportForm');
+        if (medicalReportForm) {
+            medicalReportForm.addEventListener('submit', function(event) {
+                const documentPath = document.querySelector('input[name="documentPath"]').value;
+                
+                // Basic validation for Google Drive or HTTPS links
+                if (!isValidDriveLink(documentPath)) {
+                    event.preventDefault();
+                    alert('Please provide a valid Google Drive link or HTTPS URL. Examples:\n' +
+                          '• https://drive.google.com/file/d/...\n' +
+                          '• https://docs.google.com/document/d/...\n' +
+                          '• Any HTTPS URL');
+                    return false;
+                }
+            });
         }
 
-        // Reset upload area when modal is closed
-        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
-            selectedFiles = [];
-            uploadArea.style.display = 'block';
-            uploadSuccess.style.display = 'none';
-            fileInput.value = '';
-            fileList.innerHTML = '';
+        // Function to validate drive links
+        function isValidDriveLink(url) {
+            if (!url || url.trim() === '') return false;
+            
+            // Check for valid URL format
+            try {
+                new URL(url);
+            } catch {
+                return false;
+            }
+            
+            // Check for Google Drive patterns or HTTPS
+            return url.includes('drive.google.com') || 
+                   url.includes('docs.google.com') || 
+                   url.startsWith('https://');
+        }
+
+        // Add confirmation for delete actions
+        const deleteButtons = document.querySelectorAll('form[action*="delete"] button[type="submit"]');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                if (!confirm('Are you sure you want to delete this medical report? This action cannot be undone.')) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        });
+
+        // Enhanced table interactions
+        const tables = document.querySelectorAll('table');
+        tables.forEach(table => {
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(19, 164, 236, 0.05)';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        });
+
+        // Add loading states to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function() {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn && !submitBtn.disabled) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                    
+                    // Re-enable after 5 seconds as fallback
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }, 5000);
+                }
+            });
         });
     });
 </script>
