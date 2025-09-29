@@ -54,13 +54,14 @@ public class MedicalReportService {
             throw new IllegalArgumentException("Patient not found with ID: " + patientId);
         }
 
-        MedicalReport report = new MedicalReport();
-        report.setReportType(reportType);
-        report.setDocumentPath(documentPath);
-        report.setReportDate(LocalDate.now());
-        report.setPatient(patientOpt.get());
+        // Insert new medical report using custom query
+        medicalReportRepository.insertMedicalReport(LocalDate.now(), reportType, documentPath, patientId);
         
-        return medicalReportRepository.save(report);
+        // Get the last inserted ID and return the created medical report
+        Integer newReportId = medicalReportRepository.getLastInsertedId();
+        Optional<MedicalReport> createdReport = medicalReportRepository.findById(newReportId);
+        
+        return createdReport.orElseThrow(() -> new RuntimeException("Failed to create medical report"));
     }
 
     // Update medical report
@@ -75,12 +76,12 @@ public class MedicalReportService {
             throw new IllegalArgumentException("Patient not found with ID: " + patientId);
         }
 
-        MedicalReport report = reportOpt.get();
-        report.setReportType(reportType);
-        report.setDocumentPath(documentPath);
-        report.setPatient(patientOpt.get());
+        // Update medical report using custom query
+        medicalReportRepository.updateMedicalReport(reportId, reportType, documentPath, patientId);
         
-        return medicalReportRepository.save(report);
+        // Return the updated medical report
+        Optional<MedicalReport> updatedReport = medicalReportRepository.findById(reportId);
+        return updatedReport.orElseThrow(() -> new RuntimeException("Failed to update medical report"));
     }
 
     // Delete medical report

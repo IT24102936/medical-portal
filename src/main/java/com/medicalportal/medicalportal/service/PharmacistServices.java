@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,14 @@ public class PharmacistServices {
 
     // Add new prescription
     public Prescription addPrescription(Prescription prescription) {
-        return prescriptionRepository.save(prescription);
+        // Insert prescription with only description (simplified table structure)
+        prescriptionRepository.insertPrescription(prescription.getDescription());
+        
+        // Get the last inserted ID and return the created prescription
+        Integer newPrescriptionId = prescriptionRepository.getLastInsertedId();
+        Optional<Prescription> createdPrescription = prescriptionRepository.findById(newPrescriptionId);
+        
+        return createdPrescription.orElseThrow(() -> new RuntimeException("Failed to create prescription"));
     }
 
     // Get all medicine inventory
@@ -52,17 +60,24 @@ public class PharmacistServices {
 
     // Update inventory count
     public void updateInventoryCount(Integer inventoryId, Integer newCount) {
-        Optional<MedicineInventory> inventoryOpt = medicineInventoryRepository.findById(inventoryId);
-        if (inventoryOpt.isPresent()) {
-            MedicineInventory inventory = inventoryOpt.get();
-            inventory.setCount(newCount);
-            medicineInventoryRepository.save(inventory);
-        }
+        // Update inventory count using custom query
+        medicineInventoryRepository.updateInventoryCount(inventoryId, newCount);
     }
 
     // Add new medicine to inventory
     public MedicineInventory addMedicineToInventory(MedicineInventory inventory) {
-        return medicineInventoryRepository.save(inventory);
+        // Insert new medicine inventory using custom query with available fields
+        medicineInventoryRepository.insertMedicineInventory(
+            inventory.getCount(),
+            inventory.getPharmacistEid(),
+            inventory.getDescription()
+        );
+        
+        // Get the last inserted ID and return the created inventory
+        Integer newInventoryId = medicineInventoryRepository.getLastInsertedId();
+        Optional<MedicineInventory> createdInventory = medicineInventoryRepository.findById(newInventoryId);
+        
+        return createdInventory.orElseThrow(() -> new RuntimeException("Failed to create medicine inventory"));
     }
 
     // Get all medicines
@@ -85,8 +100,9 @@ public class PharmacistServices {
         Optional<MedicineInventory> inventoryOpt = medicineInventoryRepository.findById(inventoryId);
         if (inventoryOpt.isPresent()) {
             MedicineInventory inventory = inventoryOpt.get();
-            inventory.setCount(inventory.getCount() + additionalStock);
-            medicineInventoryRepository.save(inventory);
+            Integer newCount = inventory.getCount() + additionalStock;
+            // Update inventory count using custom query
+            medicineInventoryRepository.updateInventoryCount(inventoryId, newCount);
         }
     }
 
@@ -96,15 +112,15 @@ public class PharmacistServices {
         if (inventoryOpt.isPresent()) {
             MedicineInventory inventory = inventoryOpt.get();
             int newCount = Math.max(0, inventory.getCount() - reductionAmount);
-            inventory.setCount(newCount);
             
             // Update description to include reduction reason
+            String updatedDescription = inventory.getDescription() != null ? inventory.getDescription() : "";
             if (reason != null && !reason.isEmpty()) {
-                String currentDesc = inventory.getDescription() != null ? inventory.getDescription() : "";
-                inventory.setDescription(currentDesc + " [" + reason + ": -" + reductionAmount + "]");
+                updatedDescription = updatedDescription + " [" + reason + ": -" + reductionAmount + "]";
             }
             
-            medicineInventoryRepository.save(inventory);
+            // Update inventory using custom query
+            medicineInventoryRepository.updateMedicineInventory(inventoryId, newCount, updatedDescription);
         }
     }
 

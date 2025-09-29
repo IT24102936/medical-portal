@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,7 +35,27 @@ public class PharmacistController {
     private PharmacistRepository pharmacistRepository;
 
     @GetMapping
-    public String showDashboard(Model model) {
+    public String showDashboard(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Check authentication
+        Employee employee = (Employee) session.getAttribute("loggedInEmployee");
+        String role = (String) session.getAttribute("employeeRole");
+        
+        if (employee == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Please log in to access the pharmacist dashboard.");
+            return "redirect:/auth/login?role=pharmacist";
+        }
+        
+        if (!"pharmacist".equalsIgnoreCase(role)) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Access denied. You need pharmacist privileges to access this page.");
+            return "redirect:/auth/login?role=pharmacist";
+        }
+        
+        // Add employee info to model
+        model.addAttribute("currentEmployee", employee);
+        model.addAttribute("employeeName", employee.getFirstName() + " " + employee.getLastName());
+        
         // Initialize pharmacist record if it doesn't exist
         initializePharmacistRecord();
         
@@ -64,8 +85,8 @@ public class PharmacistController {
     }
 
     @GetMapping("/dashboard")
-    public String showPharmacistDashboard(Model model) {
-        return showDashboard(model);
+    public String showPharmacistDashboard(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        return showDashboard(model, session, redirectAttributes);
     }
 
     // Add new prescription

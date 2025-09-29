@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,27 @@ public class LabTechnicianController {
     private MedicalReportService medicalReportService;
 
     @GetMapping
-    public String showDashboard(Model model) {
+    public String showDashboard(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        // Check authentication
+        Employee employee = (Employee) session.getAttribute("loggedInEmployee");
+        String role = (String) session.getAttribute("employeeRole");
+        
+        if (employee == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Please log in to access the lab technician dashboard.");
+            return "redirect:/auth/login?role=lab-technician";
+        }
+        
+        if (!"lab-technician".equalsIgnoreCase(role)) {
+            redirectAttributes.addFlashAttribute("errorMessage", 
+                "Access denied. You need lab technician privileges to access this page.");
+            return "redirect:/auth/login?role=lab-technician";
+        }
+        
+        // Add employee info to model
+        model.addAttribute("currentEmployee", employee);
+        model.addAttribute("employeeName", employee.getFirstName() + " " + employee.getLastName());
+        
         // Initialize sample data if database is empty
         if (labTechnicianService.getTotalPendingOrders() == 0) {
             initializeSampleData();
@@ -54,8 +75,8 @@ public class LabTechnicianController {
     }
 
     @GetMapping("/dashboard")
-    public String showLabTechnicianDashboard(Model model) {
-        return showDashboard(model);
+    public String showLabTechnicianDashboard(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        return showDashboard(model, session, redirectAttributes);
     }
 
     // Accept/Process doctor order

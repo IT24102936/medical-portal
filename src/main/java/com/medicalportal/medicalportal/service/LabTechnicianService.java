@@ -56,11 +56,7 @@ public class LabTechnicianService {
 
     // Get specific order by composite key
     public Optional<DoctorIssuesLabOrder> getOrderById(Integer doctorEid, Integer labOrderId, Integer patientId) {
-        DoctorIssuesLabOrderId id = new DoctorIssuesLabOrderId();
-        id.setDoctorEid(doctorEid);
-        id.setLabOrderId(labOrderId);
-        id.setPatientId(patientId);
-        return doctorIssuesLabOrderRepository.findById(id);
+        return doctorIssuesLabOrderRepository.findById(doctorEid, labOrderId, patientId);
     }
 
     // Accept/Process an order (for lab technician workflow)
@@ -90,9 +86,14 @@ public class LabTechnicianService {
 
     // Create new lab order
     public LabOrder createLabOrder(String description) {
-        LabOrder labOrder = new LabOrder();
-        labOrder.setDescription(description);
-        return labOrderRepository.save(labOrder);
+        // Insert new lab order using custom query
+        labOrderRepository.insertLabOrder(description);
+        
+        // Get the last inserted ID and return the created lab order
+        Integer newLabOrderId = labOrderRepository.getLastInsertedId();
+        Optional<LabOrder> createdLabOrder = labOrderRepository.findById(newLabOrderId);
+        
+        return createdLabOrder.orElseThrow(() -> new RuntimeException("Failed to create lab order"));
     }
 
     // Get all doctors (for reference in dropdowns)
