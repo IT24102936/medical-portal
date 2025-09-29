@@ -120,8 +120,24 @@
                         <li class="nav-item"><a class="nav-link" href="laboratory-services">Laboratory Services</a></li>
                     </ul>
                     <div class="d-flex flex-column flex-lg-row mt-3 mt-lg-0">
-                        <button class="btn btn-outline-primary fw-bold px-4 py-2 me-lg-2 mb-2 mb-lg-0">Log In</button>
-                        <button class="btn btn-primary fw-bold px-4 py-2">Sign Up</button>
+                        <div class="dropdown me-lg-2 mb-2 mb-lg-0">
+                            <button class="btn btn-outline-primary fw-bold px-4 py-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Log In
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/auth/login?role=pharmacist">💊 Pharmacist Login</a></li>
+                                <li><a class="dropdown-item" href="/auth/login?role=lab-technician">🧪 Lab Technician Login</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-primary fw-bold px-4 py-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Sign Up
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/auth/register?role=pharmacist">💊 Register as Pharmacist</a></li>
+                                <li><a class="dropdown-item" href="/auth/register?role=lab-technician">🧪 Register as Lab Technician</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
