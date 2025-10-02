@@ -1,0 +1,148 @@
+:root {
+    /* Light Theme Variables */
+    --primary-50: #eff8ff;
+    --primary-100: #dff0ff;
+    --primary-200: #b9e2ff;
+    --primary-300: #85d2ff;
+    --primary-400: #4cbaff;
+    --primary-500: #219fff;
+    --primary-600: #0a87ff;
+    --primary-700: #0075e3;
+    --primary-800: #0260b8;
+    --primary-900: #094f95;
+    --primary-950: #0c335e;
+
+    --bs-body-bg: #f8f9fa;
+    --bs-body-color: #343a40;
+    --bs-navbar-bg: #ffffff;
+    --bs-card-bg: #ffffff;
+    --bs-card-border-color: rgba(0, 117, 227, 0.2);
+    --bs-text-muted: #6c757d;
+    --bs-border-color: #e5e7eb;
+    --bs-primary-rgb: 0, 117, 227;
+
+    /* Dark Theme Variables */
+    --dark-bg: #111827;
+    --dark-body-color: #e2e8f0;
+    --dark-navbar-bg: #1f2937;
+    --dark-card-bg: rgba(31, 41, 55, 0.5);
+    --dark-card-border-color: rgba(0, 117, 227, 0.3);
+    --dark-text-muted: #9ca3af;
+    --dark-border-color: #374151;
+}
+
+body {
+    font-family: Inter, "Noto Sans", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Theme Styles */
+body.dark-theme {
+    --bs-body-bg: var(--dark-bg);
+    --bs-body-color: var(--dark-body-color);
+    --bs-navbar-bg: var(--dark-navbar-bg);
+    --bs-card-bg: var(--dark-card-bg);
+    --bs-card-border-color: var(--dark-card-border-color);
+    --bs-text-muted: var(--dark-text-muted);
+    --bs-border-color: var(--dark-border-color);
+}
+
+body.dark-theme .navbar,
+body.dark-theme footer {
+    background-color: var(--dark-navbar-bg) !important;
+    border-color: var(--dark-card-border-color) !important;
+}
+
+body.dark-theme footer p {
+    color: var(--dark-text-muted);
+}
+
+body.dark-theme .navbar-brand span,
+body.dark-theme .main-nav .nav-link {
+    color: var(--dark-body-color) !important;
+}
+body.dark-theme .main-nav .nav-link:hover { color: var(--primary-400) !important; }
+body.dark-theme .main-nav .nav-link.active { color: var(--primary-400) !important; }
+
+body.dark-theme .btn-icon {
+    color: var(--dark-body-color) !important;
+    --bs-btn-hover-bg: var(--dark-card-border-color) !important;
+    border-color: var(--dark-card-border-color) !important;
+}
+
+body.dark-theme .form-control,
+body.dark-theme .form-select,
+body.dark-theme .form-check-input {
+    background-color: var(--dark-bg);
+    border-color: var(--dark-card-border-color);
+    color: var(--dark-body-color);
+}
+
+body.dark-theme .form-control::placeholder {
+    color: var(--dark-text-muted);
+}
+
+/* General Component Styles */
+.main-nav .nav-link { font-size: 0.9rem; color: #4b5563; font-weight: 500; }
+.main-nav .nav-link:hover { color: #111827; }
+.main-nav .nav-link.active { color: var(--primary-700); font-weight: 600; }
+
+@media (min-width: 992px) {
+    .navbar-nav.main-nav { flex: 1; justify-content: center; }
+}
+
+.profile-image { width: 40px; height: 40px; background-size: cover; background-position: center; }
+.dropdown-item .material-symbols-outlined { vertical-align: bottom; font-size: 1.25rem; }
+.profile-dropdown-toggle::after { display: none; }
+
+#themeToggle.btn-icon {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Custom Report Page Styles */
+.report-option-card {
+    border: 1px solid var(--bs-card-border-color);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.report-option-card:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+.report-option-card .form-check-input:checked {
+    background-color: var(--primary-700);
+    border-color: var(--primary-700);
+}
+.form-check-input:focus {
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+.report-option-card.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-color: var(--primary-700);
+}
+
+.form-control, .form-select {
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+    background-color: var(--bs-body-bg);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-700);
+    box-shadow: 0 0 0 .25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-outline-primary-soft {
+    --bs-btn-color: var(--primary-700);
+    --bs-btn-bg: rgba(var(--bs-primary-rgb), 0.1);
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), 0.2);
+    --bs-btn-hover-border-color: transparent;
+}
