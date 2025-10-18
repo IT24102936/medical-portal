@@ -33,12 +33,12 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav main-nav" style="gap: 1rem;">
-                    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Appointments</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Patients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Doctors</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Employees</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/appointments">Appointments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/patients">Patients</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/doctors">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/employees">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/reports">Reports</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
@@ -78,20 +78,20 @@
                             <h3 class="h5 fw-bold mb-4">Report Type</h3>
                             <div class="row g-3">
                                 <div class="col-12 col-sm-6">
-                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card active">
-                                        <input class="form-check-input" type="radio" name="report-type" checked />
+                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card">
+                                        <input class="form-check-input" type="radio" name="report-type" value="user-activity" />
                                         <span class="fw-medium">User Activity</span>
                                     </label>
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card">
-                                        <input class="form-check-input" type="radio" name="report-type" />
+                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card active">
+                                        <input class="form-check-input" type="radio" name="report-type" value="appointments" checked />
                                         <span class="fw-medium">Appointments</span>
                                     </label>
                                 </div>
                                 <div class="col-12 col-sm-6">
                                     <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card">
-                                        <input class="form-check-input" type="radio" name="report-type" />
+                                        <input class="form-check-input" type="radio" name="report-type" value="billing" />
                                         <span class="fw-medium">Billing</span>
                                     </label>
                                 </div>
@@ -116,8 +116,8 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-3 pt-3">
-                        <button class="btn btn-outline-primary-soft fw-bold">Cancel</button>
-                        <button class="btn btn-primary fw-bold">Generate Report</button>
+                        <button class="btn btn-outline-primary-soft fw-bold" id="cancelBtn">Cancel</button>
+                        <button class="btn btn-primary fw-bold" id="generateReportBtn">Generate Report</button>
                     </div>
                 </div>
             </div>
@@ -133,5 +133,71 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/Admin-reports.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const generateReportBtn = document.getElementById('generateReportBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const reportTypeInputs = document.querySelectorAll('input[name="report-type"]');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+
+        // Set default date range to last 30 days
+        const today = new Date();
+        const lastMonth = new Date();
+        lastMonth.setDate(today.getDate() - 30);
+        
+        startDateInput.valueAsDate = lastMonth;
+        endDateInput.valueAsDate = today;
+
+        // Handle report type selection
+        reportTypeInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.report-option-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                this.closest('.report-option-card').classList.add('active');
+            });
+        });
+
+        // Handle generate report button click
+        generateReportBtn.addEventListener('click', function() {
+            const selectedReportType = document.querySelector('input[name="report-type"]:checked').value;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (selectedReportType === 'appointments') {
+                // Generate appointments report
+                let url = '/admin/reports/appointments';
+                if (startDate && endDate) {
+                    url += '?startDate=' + startDate + '&endDate=' + endDate;
+                }
+                
+                // Redirect to download the Excel file
+                window.location.href = url;
+            } else {
+                alert('Only appointments report is available at this time.');
+            }
+        });
+
+        // Handle cancel button click
+        cancelBtn.addEventListener('click', function() {
+            // Reset form
+            startDateInput.valueAsDate = lastMonth;
+            endDateInput.valueAsDate = today;
+            
+            // Reset report type to appointments
+            document.querySelectorAll('input[name="report-type"]').forEach(input => {
+                input.checked = input.value === 'appointments';
+            });
+            
+            document.querySelectorAll('.report-option-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            document.querySelector('input[value="appointments"]').closest('.report-option-card').classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>

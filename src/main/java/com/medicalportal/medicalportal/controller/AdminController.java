@@ -3,6 +3,7 @@ package com.medicalportal.medicalportal.controller;
 import com.medicalportal.medicalportal.entity.Doctor;
 import com.medicalportal.medicalportal.entity.Employee;
 import com.medicalportal.medicalportal.service.AdminService;
+import com.medicalportal.medicalportal.service.AppointmentService;
 import com.medicalportal.medicalportal.service.EmployeeService;
 import com.medicalportal.medicalportal.service.PatientService;
 import org.springframework.stereotype.Controller;
@@ -20,14 +21,131 @@ import java.util.Optional;
 @RequestMapping("/admin")
 public class AdminController {
     private final AdminService adminService;
+    private final AppointmentService appointmentService;
     private final EmployeeService employeeService;
     private final PatientService patientService;
 
-    public AdminController(AdminService adminService, EmployeeService employeeService, PatientService patientService) {
+    public AdminController(AdminService adminService, AppointmentService appointmentService, EmployeeService employeeService, PatientService patientService) {
         this.adminService = adminService;
+        this.appointmentService = appointmentService;
         this.employeeService = employeeService;
         this.patientService = patientService;
     }
+
+    // =============== DASHBOARD ENDPOINT ===============
+    
+    @GetMapping("/dashboard")
+    public String dashboard(Model model) {
+        try {
+            // Get statistics for the dashboard
+            List<Map<String, Object>> patients = patientService.getAllPatients();
+            List<Doctor> doctors = adminService.getAllDoctors();
+            List<Map<String, Object>> employees = employeeService.getAllEmployees();
+            List<Map<String, Object>> todaysAppointments = appointmentService.getTodaysAppointments();
+            List<Map<String, Object>> allAppointments = appointmentService.getAllAppointments();
+            
+            // Calculate statistics
+            int totalPatients = patients.size();
+            int totalDoctors = doctors.size();
+            int totalEmployees = employees.size();
+            int todayAppointments = todaysAppointments.size();
+            int totalAppointments = allAppointments.size();
+            
+            // Add statistics to model
+            model.addAttribute("totalPatients", totalPatients);
+            model.addAttribute("totalDoctors", totalDoctors);
+            model.addAttribute("totalEmployees", totalEmployees);
+            model.addAttribute("todayAppointments", todayAppointments);
+            model.addAttribute("totalAppointments", totalAppointments);
+            
+            // Add appointments list for the table (limit to first 6)
+            if (todaysAppointments.size() > 6) {
+                model.addAttribute("appointments", todaysAppointments.subList(0, 6));
+            } else {
+                model.addAttribute("appointments", todaysAppointments);
+            }
+            
+            System.out.println("Dashboard loaded with: " + totalPatients + " patients, " + 
+                             totalDoctors + " doctors, " + totalEmployees + " employees, " +
+                             todayAppointments + " today's appointments, " + 
+                             totalAppointments + " total appointments");
+            
+        } catch (Exception e) {
+            System.err.println("Error loading dashboard: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Add default values in case of error
+            model.addAttribute("totalPatients", 0);
+            model.addAttribute("totalDoctors", 0);
+            model.addAttribute("totalEmployees", 0);
+            model.addAttribute("todayAppointments", 0);
+            model.addAttribute("totalAppointments", 0);
+            model.addAttribute("appointments", java.util.Collections.emptyList());
+            model.addAttribute("error", "Error loading dashboard data: " + e.getMessage());
+        }
+        
+        return "admin/Admin-dashboard";
+    }
+
+    // =============== APPOINTMENT STATISTICS ENDPOINT ===============
+    
+    @GetMapping("/dashboard/appointment-stats")
+    @ResponseBody
+    public Map<String, Object> getAppointmentStats() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Map<String, Object>> stats = appointmentService.getAppointmentCountsBySpecialization();
+            
+            // Prepare data for the chart
+            String[] labels = new String[stats.size()];
+            int[] data = new int[stats.size()];
+            
+            for (int i = 0; i < stats.size(); i++) {
+                Map<String, Object> stat = stats.get(i);
+                labels[i] = stat.get("specialization") != null ? stat.get("specialization").toString() : "Unknown";
+                data[i] = stat.get("count") != null ? Integer.parseInt(stat.get("count").toString()) : 0;
+            }
+            
+            response.put("labels", labels);
+            response.put("data", data);
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+        }
+        return response;
+    }
+
+    // =============== APPOINTMENT TRENDS ENDPOINT ===============
+    
+    @GetMapping("/appointments/trends")
+    @ResponseBody
+    public Map<String, Object> getAppointmentTrends() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Map<String, Object>> trends = appointmentService.getAppointmentCountsByMonth();
+            
+            // Prepare data for the chart
+            String[] labels = new String[trends.size()];
+            int[] data = new int[trends.size()];
+            
+            for (int i = 0; i < trends.size(); i++) {
+                Map<String, Object> trend = trends.get(i);
+                labels[i] = trend.get("month") != null ? trend.get("month").toString() : "Unknown";
+                data[i] = trend.get("count") != null ? Integer.parseInt(trend.get("count").toString()) : 0;
+            }
+            
+            response.put("labels", labels);
+            response.put("data", data);
+            response.put("success", true);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+        }
+        return response;
+    }
+
+    // =============== DOCTOR MANAGEMENT ENDPOINTS ===============
 
     @GetMapping("/doctors")
     public String doctors(Model model) {
@@ -85,18 +203,18 @@ public class AdminController {
                             @RequestParam String specialization,
                             @RequestParam String password,
                             @RequestParam String confirmPassword) {
-        
+
         // Validate password confirmation
         if (!password.equals(confirmPassword)) {
             // In a real application, you'd want to handle this error properly
             throw new RuntimeException("Passwords do not match");
         }
-        
+
         LocalDate localDob = null;
         if (dob != null && !dob.trim().isEmpty()) {
             localDob = LocalDate.parse(dob);
         }
-        
+
         adminService.addDoctor(firstName, lastName, email, gender, localDob, salary, phone, nationalId, userName, specialization, password);
         return "redirect:/admin/doctors";
     }
@@ -146,7 +264,7 @@ public class AdminController {
         try {
             List<Map<String, Object>> employees = employeeService.getAllEmployees();
             StringBuilder result = new StringBuilder("Database connection successful. Found " + employees.size() + " employees.\n\n");
-            
+
             // Show first employee to check status column
             if (!employees.isEmpty()) {
                 Map<String, Object> firstEmployee = employees.get(0);
@@ -154,7 +272,7 @@ public class AdminController {
                 result.append("Status column exists: ").append(firstEmployee.containsKey("status")).append("\n");
                 result.append("Status value: ").append(firstEmployee.get("status"));
             }
-            
+
             return result.toString();
         } catch (Exception e) {
             return "Database error: " + e.getMessage() + "\n\nFull stack trace:\n" + java.util.Arrays.toString(e.getStackTrace());
@@ -179,36 +297,6 @@ public class AdminController {
 
     @PostMapping("/employees/add")
     public String addEmployee(@RequestParam String firstName,
-                             @RequestParam String lastName,
-                             @RequestParam String email,
-                             @RequestParam String gender,
-                             @RequestParam(required = false) String dob,
-                             @RequestParam BigDecimal salary,
-                             @RequestParam(required = false) String phone,
-                             @RequestParam(required = false) String nationalId,
-                             @RequestParam String userName,
-                             @RequestParam String role,
-                             @RequestParam String password,
-                             @RequestParam String confirmPassword) {
-        
-        // Validate password confirmation
-        if (!password.equals(confirmPassword)) {
-            throw new RuntimeException("Passwords do not match");
-        }
-        
-        LocalDate localDob = null;
-        if (dob != null && !dob.trim().isEmpty()) {
-            localDob = LocalDate.parse(dob);
-        }
-        
-        employeeService.addEmployee(firstName, lastName, email, gender, localDob, salary, 
-                                  phone, nationalId, userName, role, password);
-        return "redirect:/admin/employees";
-    }
-
-    @PostMapping("/employees/edit/{eid}")
-    public String editEmployee(@PathVariable Integer eid,
-                              @RequestParam String firstName,
                               @RequestParam String lastName,
                               @RequestParam String email,
                               @RequestParam String gender,
@@ -217,17 +305,47 @@ public class AdminController {
                               @RequestParam(required = false) String phone,
                               @RequestParam(required = false) String nationalId,
                               @RequestParam String userName,
-                              @RequestParam String status,
                               @RequestParam String role,
-                              @RequestParam(required = false) String password) {
-        
+                              @RequestParam String password,
+                              @RequestParam String confirmPassword) {
+
+        // Validate password confirmation
+        if (!password.equals(confirmPassword)) {
+            throw new RuntimeException("Passwords do not match");
+        }
+
         LocalDate localDob = null;
         if (dob != null && !dob.trim().isEmpty()) {
             localDob = LocalDate.parse(dob);
         }
-        
-        employeeService.updateEmployee(eid, firstName, lastName, email, gender, localDob, 
-                                     salary, phone, nationalId, userName, status, role, password);
+
+        employeeService.addEmployee(firstName, lastName, email, gender, localDob, salary,
+                phone, nationalId, userName, role, password);
+        return "redirect:/admin/employees";
+    }
+
+    @PostMapping("/employees/edit/{eid}")
+    public String editEmployee(@PathVariable Integer eid,
+                               @RequestParam String firstName,
+                               @RequestParam String lastName,
+                               @RequestParam String email,
+                               @RequestParam String gender,
+                               @RequestParam(required = false) String dob,
+                               @RequestParam BigDecimal salary,
+                               @RequestParam(required = false) String phone,
+                               @RequestParam(required = false) String nationalId,
+                               @RequestParam String userName,
+                               @RequestParam String status,
+                               @RequestParam String role,
+                               @RequestParam(required = false) String password) {
+
+        LocalDate localDob = null;
+        if (dob != null && !dob.trim().isEmpty()) {
+            localDob = LocalDate.parse(dob);
+        }
+
+        employeeService.updateEmployee(eid, firstName, lastName, email, gender, localDob,
+                salary, phone, nationalId, userName, status, role, password);
         return "redirect:/admin/employees";
     }
 
@@ -254,7 +372,7 @@ public class AdminController {
     public Map<String, Object> getEmployeeDetails(@PathVariable Integer eid) {
         Map<String, Object> response = new HashMap<>();
         var employeeOpt = employeeService.getEmployeeById(eid);
-        
+
         if (employeeOpt.isPresent()) {
             Map<String, Object> employee = employeeOpt.get();
             response.put("firstName", employee.get("first_name") != null ? employee.get("first_name").toString() : "");
@@ -267,7 +385,7 @@ public class AdminController {
             response.put("userName", employee.get("user_name") != null ? employee.get("user_name").toString() : "");
             response.put("status", employee.get("status") != null ? employee.get("status").toString() : "ACTIVE");
             response.put("role", employee.get("role") != null ? employee.get("role").toString() : "Employee");
-            
+
             // Get phone numbers
             List<String> phoneNumbers = employeeService.getPhoneNumbersByEid(eid);
             response.put("phone", phoneNumbers.isEmpty() ? "" : phoneNumbers.get(0));
@@ -308,29 +426,29 @@ public class AdminController {
 
     @PostMapping("/patients/add")
     public String addPatient(@RequestParam String firstName,
-                            @RequestParam String lastName,
-                            @RequestParam String email,
-                            @RequestParam String gender,
-                            @RequestParam(required = false) String dob,
-                            @RequestParam(required = false) String phone,
-                            @RequestParam(required = false) String nationalId,
-                            @RequestParam String userName,
-                            @RequestParam String password,
-                            @RequestParam String confirmPassword) {
-        
+                             @RequestParam String lastName,
+                             @RequestParam String email,
+                             @RequestParam String gender,
+                             @RequestParam(required = false) String dob,
+                             @RequestParam(required = false) String phone,
+                             @RequestParam(required = false) String nationalId,
+                             @RequestParam String password,
+                             @RequestParam String confirmPassword) {
+
         // Validate password confirmation
         if (!password.equals(confirmPassword)) {
             return "redirect:/admin/patients?error=Password confirmation does not match";
         }
-        
+
         try {
             LocalDate dateOfBirth = null;
             if (dob != null && !dob.trim().isEmpty()) {
                 dateOfBirth = LocalDate.parse(dob);
             }
-            
-            patientService.addPatient(firstName, lastName, email, gender, dateOfBirth, 
-                                    phone, nationalId, userName, password);
+
+            // Pass empty string for userName since it's not in the database schema
+            patientService.addPatient(firstName, lastName, email, gender, dateOfBirth,
+                    phone, nationalId, "", password);
             return "redirect:/admin/patients?success=Patient added successfully";
         } catch (Exception e) {
             System.err.println("Error adding patient: " + e.getMessage());
@@ -340,22 +458,23 @@ public class AdminController {
 
     @PostMapping("/patients/edit/{pid}")
     public String editPatient(@PathVariable Integer pid,
-                             @RequestParam String firstName,
-                             @RequestParam String lastName,
-                             @RequestParam String email,
-                             @RequestParam String gender,
-                             @RequestParam(required = false) String dob,
-                             @RequestParam(required = false) String phone,
-                             @RequestParam(required = false) String nationalId,
-                             @RequestParam String userName) {
+                              @RequestParam String firstName,
+                              @RequestParam String lastName,
+                              @RequestParam String email,
+                              @RequestParam String gender,
+                              @RequestParam(required = false) String dob,
+                              @RequestParam(required = false) String phone,
+                              @RequestParam(required = false) String nationalId
+                              ) {
         try {
             LocalDate dateOfBirth = null;
             if (dob != null && !dob.trim().isEmpty()) {
                 dateOfBirth = LocalDate.parse(dob);
             }
-            
-            patientService.updatePatient(pid, firstName, lastName, email, gender, 
-                                       dateOfBirth, phone, nationalId, userName);
+
+            // Pass empty string for userName since it's not in the database schema
+            patientService.updatePatient(pid, firstName, lastName, email, gender,
+                    dateOfBirth, phone, nationalId, "");
             return "redirect:/admin/patients?success=Patient updated successfully";
         } catch (Exception e) {
             System.err.println("Error updating patient: " + e.getMessage());
@@ -401,7 +520,7 @@ public class AdminController {
     public Map<String, Object> getPatientDetails(@PathVariable Integer pid) {
         Map<String, Object> response = new HashMap<>();
         Optional<Map<String, Object>> patientData = patientService.getPatientById(pid);
-        
+
         if (patientData.isPresent()) {
             Map<String, Object> patient = patientData.get();
             response.put("firstName", patient.get("first_name") != null ? patient.get("first_name") : "");
@@ -411,7 +530,6 @@ public class AdminController {
             response.put("dob", patient.get("dob") != null ? patient.get("dob").toString() : "");
             response.put("phone", patient.get("phone_numbers") != null ? patient.get("phone_numbers").toString().split(",")[0].trim() : "");
             response.put("nationalId", patient.get("national_id") != null ? patient.get("national_id") : "");
-            response.put("userName", patient.get("user_name") != null ? patient.get("user_name") : "");
             response.put("status", patient.get("status") != null ? patient.get("status") : "ACTIVE");
         } else {
             response.put("firstName", "");
@@ -421,10 +539,82 @@ public class AdminController {
             response.put("dob", "");
             response.put("phone", "");
             response.put("nationalId", "");
-            response.put("userName", "");
             response.put("status", "ACTIVE");
         }
-        
+
         return response;
+    }
+
+    // =============== APPOINTMENT MANAGEMENT ENDPOINTS ===============
+
+    @GetMapping("/appointments")
+    public String appointments(Model model) {
+        try {
+            List<Map<String, Object>> upcomingAppointments = appointmentService.getUpcomingAppointments();
+            List<Map<String, Object>> pastAppointments = appointmentService.getPastAppointments();
+            List<Map<String, Object>> canceledAppointments = appointmentService.getCanceledAppointments();
+
+            model.addAttribute("upcomingAppointments", upcomingAppointments);
+            model.addAttribute("pastAppointments", pastAppointments);
+            model.addAttribute("canceledAppointments", canceledAppointments);
+
+            System.out.println("Found " + upcomingAppointments.size() + " upcoming appointments");
+            return "admin/Admin-appointments";
+        } catch (Exception e) {
+            System.err.println("Error loading appointments: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("upcomingAppointments", java.util.Collections.emptyList());
+            model.addAttribute("pastAppointments", java.util.Collections.emptyList());
+            model.addAttribute("canceledAppointments", java.util.Collections.emptyList());
+            model.addAttribute("error", "Error loading appointments: " + e.getMessage());
+            return "admin/Admin-appointments";
+        }
+    }
+
+    @PostMapping("/appointments/cancel/{appointmentId}")
+    public String cancelAppointment(@PathVariable Integer appointmentId) {
+        try {
+            appointmentService.cancelAppointment(appointmentId);
+            return "redirect:/admin/appointments?success=Appointment canceled successfully";
+        } catch (Exception e) {
+            System.err.println("Error canceling appointment: " + e.getMessage());
+            return "redirect:/admin/appointments?error=Failed to cancel appointment: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/appointments/delete/{appointmentId}")
+    public String deleteAppointment(@PathVariable Integer appointmentId) {
+        try {
+            appointmentService.deleteAppointment(appointmentId);
+            return "redirect:/admin/appointments?success=Appointment deleted successfully";
+        } catch (Exception e) {
+            System.err.println("Error deleting appointment: " + e.getMessage());
+            return "redirect:/admin/appointments?error=Failed to delete appointment: " + e.getMessage();
+        }
+    }
+
+    @GetMapping("/appointments/upcoming")
+    @ResponseBody
+    public List<Map<String, Object>> getUpcomingAppointments() {
+        return appointmentService.getUpcomingAppointments();
+    }
+
+    @GetMapping("/appointments/past")
+    @ResponseBody
+    public List<Map<String, Object>> getPastAppointments() {
+        return appointmentService.getPastAppointments();
+    }
+
+    @GetMapping("/appointments/canceled")
+    @ResponseBody
+    public List<Map<String, Object>> getCanceledAppointments() {
+        return appointmentService.getCanceledAppointments();
+    }
+
+    // =============== REPORTS ENDPOINT ===============
+
+    @GetMapping("/reports")
+    public String reports() {
+        return "admin/Admin-reports";
     }
 }

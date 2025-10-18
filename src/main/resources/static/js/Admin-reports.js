@@ -22,13 +22,4 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTheme(newTheme);
         localStorage.setItem('theme', newTheme);
     });
-
-    // Logic for report option card active state
-    const reportOptions = document.querySelectorAll('.report-option-card');
-    reportOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            reportOptions.forEach(o => o.classList.remove('active'));
-            option.classList.add('active');
-        });
-    });
 });
