@@ -5,7 +5,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     let typesChart, trendsChart;
 
-    const renderCharts = () => {
+    // Function to fetch appointment statistics by specialization
+    const fetchAppointmentStats = async () => {
+        try {
+            const response = await fetch('/admin/dashboard/appointment-stats');
+            const data = await response.json();
+            
+            if (data.success) {
+                return {
+                    labels: data.labels,
+                    data: data.data
+                };
+            } else {
+                console.error('Error fetching appointment stats:', data.error);
+                // Return default data in case of error
+                return {
+                    labels: ['Cardiology', 'Dermatology', 'Pediatrics', 'Neurology'],
+                    data: [48, 36, 24, 12]
+                };
+            }
+        } catch (error) {
+            console.error('Error fetching appointment stats:', error);
+            // Return default data in case of error
+            return {
+                labels: ['Cardiology', 'Dermatology', 'Pediatrics', 'Neurology'],
+                data: [48, 36, 24, 12]
+            };
+        }
+    };
+
+    // Function to fetch appointment trends data
+    const fetchAppointmentTrends = async () => {
+        try {
+            const response = await fetch('/admin/appointments/trends');
+            const data = await response.json();
+            
+            if (data.success) {
+                return {
+                    labels: data.labels,
+                    data: data.data
+                };
+            } else {
+                console.error('Error fetching appointment trends:', data.error);
+                // Return default data in case of error
+                return {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    data: [180, 150, 170, 210, 160, 250]
+                };
+            }
+        } catch (error) {
+            console.error('Error fetching appointment trends:', error);
+            // Return default data in case of error
+            return {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                data: [180, 150, 170, 210, 160, 250]
+            };
+        }
+    };
+
+    const renderCharts = async () => {
         if (typesChart) typesChart.destroy();
         if (trendsChart) trendsChart.destroy();
 
@@ -14,21 +72,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const textColor = isDarkMode ? style.getPropertyValue('--dark-body-color').trim() : style.getPropertyValue('--bs-text-muted').trim();
         const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
+        // Fetch real appointment data
+        const stats = await fetchAppointmentStats();
+
         // Appointments by Specialization (Donut Chart)
         const typesCtx = document.getElementById('appointmentsByTypeChart').getContext('2d');
         typesChart = new Chart(typesCtx, {
             type: 'doughnut',
             data: {
-                // DATA LABELS CHANGED HERE
-                labels: ['Cardiology', 'Dermatology', 'Pediatrics', 'Neurology'],
+                labels: stats.labels,
                 datasets: [{
                     label: 'Appointments',
-                    data: [48, 36, 24, 12],
+                    data: stats.data,
                     backgroundColor: [
                         style.getPropertyValue('--primary-500').trim(),
                         style.getPropertyValue('--primary-400').trim(),
                         style.getPropertyValue('--primary-300').trim(),
-                        style.getPropertyValue('--primary-200').trim()
+                        style.getPropertyValue('--primary-200').trim(),
+                        style.getPropertyValue('--primary-600').trim(),
+                        style.getPropertyValue('--primary-700').trim()
                     ],
                     borderColor: isDarkMode ? style.getPropertyValue('--dark-card-bg').trim() : style.getPropertyValue('--bs-card-bg').trim(),
                     borderWidth: 4,
@@ -45,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Fetch real appointment trends data
+        const trends = await fetchAppointmentTrends();
+
         // Appointment Trends (Area Chart)
         const trendsCtx = document.getElementById('appointmentTrendsChart').getContext('2d');
         const primary400 = style.getPropertyValue('--primary-400').trim();
@@ -56,10 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
         trendsChart = new Chart(trendsCtx, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: trends.labels,
                 datasets: [{
                     label: 'Appointments',
-                    data: [180, 150, 170, 210, 160, 250],
+                    data: trends.data,
                     borderColor: primary400,
                     backgroundColor: gradient,
                     pointBackgroundColor: primary400,

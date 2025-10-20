@@ -1,5 +1,6 @@
 <!-- src/main/webapp/WEB-INF/views/admin/Admin-dashboard.jsp -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,11 +36,11 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav main-nav" style="gap: 1rem;">
                     <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Appointments</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Patients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Doctors</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Employees</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/appointments">Appointments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/patients">Patients</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/doctors">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/employees">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/reports">Reports</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
@@ -70,43 +71,92 @@
             <div class="row g-4 g-lg-5">
                 <div class="col-lg-8">
                     <div class="d-flex flex-column gap-5">
-                        <h2 class="fw-bold" style="font-size: 1.875rem;">Welcome back, Pasindu Samarasingha</h2>
+                        <h2 class="fw-bold" style="font-size: 1.875rem;">Welcome back, Admin</h2>
 
                         <div class="row g-4">
-                            <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="col-12 col-sm-6 col-xl-4">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
                                         <p class="text-muted small fw-medium">Total Patient</p>
-                                        <p class="h3 fw-bold mt-2">1,250</p>
+                                        <p class="h3 fw-bold mt-2">${totalPatients}</p>
                                         <p class="small fw-medium text-success mb-0 mt-1">+10%</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="col-12 col-sm-6 col-xl-4">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
                                         <p class="text-muted small fw-medium">Today's Appointments</p>
-                                        <p class="h3 fw-bold mt-2">12</p>
+                                        <p class="h3 fw-bold mt-2">${todayAppointments}</p>
                                         <p class="small fw-medium text-success mb-0 mt-1">+5%</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="col-12 col-sm-6 col-xl-4">
                                 <div class="card shadow-sm h-100">
                                     <div class="card-body">
                                         <p class="text-muted small fw-medium">Total Doctors</p>
-                                        <p class="h3 fw-bold mt-2">28</p>
+                                        <p class="h3 fw-bold mt-2">${totalDoctors}</p>
                                         <p class="small fw-medium text-success mb-0 mt-1">+8%</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3">
-                                <div class="card shadow-sm h-100">
-                                    <div class="card-body">
-                                        <p class="text-muted small fw-medium">Monthly Revenue</p>
-                                        <p class="h3 fw-bold mt-2">$25,000</p>
-                                        <p class="small fw-medium text-success mb-0 mt-1">+12%</p>
-                                    </div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-3">
+                            <h3 class="h5 fw-bold">Quick Links</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <a href="/admin/patients" class="card shadow-sm h-100 text-decoration-none">
+                                        <div class="card-body d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-primary bg-opacity-10 p-3">
+                                                <span class="material-symbols-outlined text-primary">groups</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 fw-bold mb-1">Patient Management</h4>
+                                                <p class="text-muted small mb-0">Manage all patients</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="/admin/doctors" class="card shadow-sm h-100 text-decoration-none">
+                                        <div class="card-body d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                                                <span class="material-symbols-outlined text-success">medical_information</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 fw-bold mb-1">Doctor Management</h4>
+                                                <p class="text-muted small mb-0">Manage all doctors</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="/admin/employees" class="card shadow-sm h-100 text-decoration-none">
+                                        <div class="card-body d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-info bg-opacity-10 p-3">
+                                                <span class="material-symbols-outlined text-info">badge</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 fw-bold mb-1">Employee Management</h4>
+                                                <p class="text-muted small mb-0">Manage all employees</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="/admin/appointments" class="card shadow-sm h-100 text-decoration-none">
+                                        <div class="card-body d-flex align-items-center gap-3">
+                                            <div class="rounded-circle bg-warning bg-opacity-10 p-3">
+                                                <span class="material-symbols-outlined text-warning">calendar_month</span>
+                                            </div>
+                                            <div>
+                                                <h4 class="h6 fw-bold mb-1">Appointments</h4>
+                                                <p class="text-muted small mb-0">Manage appointments</p>
+                                            </div>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -123,42 +173,19 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Sophia Clark</td>
-                                    <td class="px-4 py-3 text-muted">Dr. Emily White</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-red-light px-3 py-2">Cardiology</span></td>
-                                    <td class="px-4 py-3 text-muted">9:00 AM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Ethan Bennett</td>
-                                    <td class="px-4 py-3 text-muted">Dr. James Green</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-yellow-light px-3 py-2">Dermatology</span></td>
-                                    <td class="px-4 py-3 text-muted">10:30 AM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Olivia Carter</td>
-                                    <td class="px-4 py-3 text-muted">Dr. Olivia Blue</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-green-light px-3 py-2">Pediatrics</span></td>
-                                    <td class="px-4 py-3 text-muted">1:00 PM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Liam Davis</td>
-                                    <td class="px-4 py-3 text-muted">Dr. Benjamin Gray</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-blue-light px-3 py-2">Neurology</span></td>
-                                    <td class="px-4 py-3 text-muted">2:30 PM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Ava Evans</td>
-                                    <td class="px-4 py-3 text-muted">Dr. Ava Black</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-purple-light px-3 py-2">Oncology</span></td>
-                                    <td class="px-4 py-3 text-muted">4:00 PM</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 fw-medium">Noah Wilson</td>
-                                    <td class="px-4 py-3 text-muted">Dr. Lucas Crimson</td>
-                                    <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-teal-light px-3 py-2">Orthopedics</span></td>
-                                    <td class="px-4 py-3 text-muted">4:15 PM</td>
-                                </tr>
+                                <c:forEach var="appointment" items="${appointments}">
+                                    <tr>
+                                        <td class="px-4 py-3 fw-medium">${appointment.patient_name}</td>
+                                        <td class="px-4 py-3 text-muted">${appointment.doctor_name}</td>
+                                        <td class="px-4 py-3"><span class="badge rounded-pill fw-medium bg-red-light px-3 py-2">${appointment.doctor_specialization}</span></td>
+                                        <td class="px-4 py-3 text-muted">${appointment.appointment_time_formatted}</td>
+                                    </tr>
+                                </c:forEach>
+                                <c:if test="${empty appointments}">
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-3 text-center text-muted">No appointments scheduled for today</td>
+                                    </tr>
+                                </c:if>
                                 </tbody>
                             </table>
                             <div class="d-flex justify-content-end mt-2">
@@ -168,7 +195,7 @@
                                             <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
                                         </li>
                                         <li class="page-item">
-                                            <a class="page-link" href="#">Next</a>
+                                            <a class="page-link" href="/admin/appointments">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
@@ -185,12 +212,9 @@
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
                                         <p class="small text-muted fw-medium">Appointments by Doctor Specialization</p>
-                                        <p class="h4 fw-bold mt-1">120</p>
+                                        <p class="h4 fw-bold mt-1">${totalAppointments}</p>
                                     </div>
-                                    <div class="d-flex align-items-center gap-1 small fw-medium text-success">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem;"> trending_up </span>
-                                        <span>+15%</span>
-                                    </div>
+                                    
                                 </div>
                                 <div class="chart-container mx-auto" style="height: 140px; max-width: 140px;">
                                     <canvas id="appointmentsByTypeChart"></canvas>
@@ -202,14 +226,11 @@
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
                                         <p class="small text-muted fw-medium">Appointment Trends</p>
-                                        <p class="h4 fw-bold mt-1">250</p>
+                                        <p class="h4 fw-bold mt-1">${totalAppointments}</p>
                                     </div>
-                                    <div class="d-flex align-items-center gap-1 small fw-medium text-success">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem;"> trending_up </span>
-                                        <span>+10%</span>
-                                    </div>
+                                    
                                 </div>
-                                <div class="chart-container">
+                                <div class="chart-container" style="height: 200px;">
                                     <canvas id="appointmentTrendsChart"></canvas>
                                 </div>
                             </div>
