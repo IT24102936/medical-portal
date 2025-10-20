@@ -134,7 +134,7 @@
                     <table class="table align-middle mb-0">
                         <thead>
                         <tr>
-                            <th class="px-4 py-3">Id</th> <!-- Renamed from "Patient ID" to "Id" -->
+                            <th class="px-4 py-3">Id</th>
                             <th class="px-4 py-3">Name</th>
                             <th class="px-4 py-3">Email</th>
                             <th class="px-4 py-3">Contact</th>
@@ -147,8 +147,8 @@
                         <c:choose>
                             <c:when test="${not empty patients}">
                                 <c:forEach var="patient" items="${patients}">
-                                    <tr data-patient-id="${patient.patient_id}"> <!-- Updated from patient.pid to patient_id -->
-                                        <td class="px-4 py-3 text-muted">${patient.patient_id}</td> <!-- Updated from patient.pid to patient_id -->
+                                    <tr data-patient-id="${patient.patient_id}">
+                                        <td class="px-4 py-3 text-muted">${patient.patient_id}</td>
                                         <td class="px-4 py-3 fw-medium">${patient.first_name} ${patient.last_name}</td>
                                         <td class="px-4 py-3 text-muted">${patient.email}</td>
                                         <td class="px-4 py-3 text-muted">
@@ -174,20 +174,20 @@
                                             <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
                                                 <c:choose>
                                                     <c:when test="${patient.status == 'ACTIVE'}">
-                                                        <button class="btn btn-outline-warning btn-action btn-action-disable" data-patient-id="${patient.patient_id}"> <!-- Updated from patient.pid to patient_id -->
+                                                        <button class="btn btn-outline-warning btn-action btn-action-disable" data-patient-id="${patient.patient_id}">
                                                             <span class="material-symbols-outlined"> block </span> Disable
                                                         </button>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <button class="btn btn-outline-success btn-action btn-action-enable" data-patient-id="${patient.patient_id}"> <!-- Updated from patient.pid to patient_id -->
+                                                        <button class="btn btn-outline-success btn-action btn-action-enable" data-patient-id="${patient.patient_id}">
                                                             <span class="material-symbols-outlined"> check_circle </span> Enable
                                                         </button>
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <button class="btn btn-outline-primary btn-action btn-action-edit" data-patient-id="${patient.patient_id}"> <!-- Updated from patient.pid to patient_id -->
+                                                <button class="btn btn-outline-primary btn-action btn-action-edit" data-patient-id="${patient.patient_id}" data-bs-toggle="modal" data-bs-target="#editPatientModal">
                                                     <span class="material-symbols-outlined"> edit </span> Edit
                                                 </button>
-                                                <button class="btn btn-outline-danger btn-action btn-action-delete" data-patient-id="${patient.patient_id}"> <!-- Updated from patient.pid to patient_id -->
+                                                <button class="btn btn-outline-danger btn-action btn-action-delete" data-patient-id="${patient.patient_id}">
                                                     <span class="material-symbols-outlined"> delete </span> Delete
                                                 </button>
                                             </div>
@@ -228,17 +228,9 @@
                 <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addPatientForm" action="/admin/patients/add" method="post">
+            <form id="addPatientForm" action="${pageContext.request.contextPath}/admin/patients/add" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 text-center mb-4">
-                            <div class="patient-avatar-large" id="addAvatarPreview">
-                                <img src="https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👤" alt="Avatar" id="addAvatarImg">
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -294,12 +286,6 @@
                                 <input type="text" class="form-control" id="addNationalId" name="nationalId" placeholder="123456789V">
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="addUserName" class="form-label">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="addUserName" name="userName" required>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="row">
@@ -336,16 +322,7 @@
             </div>
             <form id="editPatientForm" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                <input type="hidden" id="editPatientId" name="pid">
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-12 text-center mb-4">
-                            <div class="patient-avatar-large" id="editAvatarPreview">
-                                <img src="https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👤" alt="Avatar" id="editAvatarImg">
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -401,12 +378,6 @@
                                 <input type="text" class="form-control" id="editNationalId" name="nationalId" placeholder="123456789V">
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="editUserName" class="form-label">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="editUserName" name="userName" required>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -420,5 +391,75 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/Admin-Patient_management.js"></script>
+
+<script>
+// Add JavaScript for avatar preview updates
+document.addEventListener('DOMContentLoaded', function() {
+    // Update avatar when gender changes in add form
+    const addGenderSelect = document.getElementById('addGender');
+    const addAvatarImg = document.getElementById('addAvatarImg');
+    
+    if (addGenderSelect && addAvatarImg) {
+        addGenderSelect.addEventListener('change', function() {
+            const gender = this.value;
+            if (gender === 'Female') {
+                addAvatarImg.src = 'https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👩';
+            } else {
+                addAvatarImg.src = 'https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👨';
+            }
+        });
+    }
+    
+    // Update avatar when gender changes in edit form
+    const editGenderSelect = document.getElementById('editGender');
+    const editAvatarImg = document.getElementById('editAvatarImg');
+    
+    if (editGenderSelect && editAvatarImg) {
+        editGenderSelect.addEventListener('change', function() {
+            const gender = this.value;
+            if (gender === 'Female') {
+                editAvatarImg.src = 'https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👩';
+            } else {
+                editAvatarImg.src = 'https://via.placeholder.com/120x120/f8f9fa/6c757d?text=👨';
+            }
+        });
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('patientSearchInput');
+    const tableBody = document.getElementById('patientTableBody');
+    const tableRows = tableBody.getElementsByTagName('tr');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            const query = this.value.toLowerCase();
+            
+            for (let i = 0; i < tableRows.length; i++) {
+                const row = tableRows[i];
+                const patientId = row.cells[0].textContent.toLowerCase();
+                const patientName = row.cells[1].textContent.toLowerCase();
+                
+                if (patientId.includes(query) || patientName.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
+    
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        });
+    }
+});
+</script>
 </body>
 </html>

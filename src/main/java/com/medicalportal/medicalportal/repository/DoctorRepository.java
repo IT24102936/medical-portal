@@ -132,4 +132,37 @@ public interface DoctorRepository extends JpaRepository<Doctor, Integer> {
 
     @Query(value = "SELECT COALESCE(MAX(eid), 0) + 1 FROM employee", nativeQuery = true)
     Integer getNextEmployeeId();
+    
+    // Check if username is already taken
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE user_name = :userName", nativeQuery = true)
+    int countByUserName(@Param("userName") String userName);
+    
+    // Check if email is already taken
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE email = :email", nativeQuery = true)
+    int countByEmail(@Param("email") String email);
+    
+    // Check if username is already taken by another doctor (for updates)
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE user_name = :userName AND eid != :eid", nativeQuery = true)
+    int countByUserNameAndEidNot(@Param("userName") String userName, @Param("eid") Integer eid);
+    
+    // Check if email is already taken by another doctor (for updates)
+    @Query(value = "SELECT COUNT(*) FROM employee WHERE email = :email AND eid != :eid", nativeQuery = true)
+    int countByEmailAndEidNot(@Param("email") String email, @Param("eid") Integer eid);
+    
+    // Helper methods to check existence
+    default boolean existsByUserName(String userName) {
+        return countByUserName(userName) > 0;
+    }
+    
+    default boolean existsByEmail(String email) {
+        return countByEmail(email) > 0;
+    }
+    
+    default boolean existsByUserNameAndEidNot(String userName, Integer eid) {
+        return countByUserNameAndEidNot(userName, eid) > 0;
+    }
+    
+    default boolean existsByEmailAndEidNot(String email, Integer eid) {
+        return countByEmailAndEidNot(email, eid) > 0;
+    }
 }

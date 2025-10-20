@@ -88,6 +88,20 @@
 
     <main class="flex-grow-1 p-4 p-lg-5">
         <div class="container-xl">
+            <!-- Error and Success Messages -->
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> ${param.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.success}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> ${param.success}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-5">
                 <h1 class="h2 fw-bold mb-3 mb-sm-0">Doctor Management</h1>
                 <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addDoctorModal">

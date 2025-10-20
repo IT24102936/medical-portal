@@ -138,7 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Delete button clicked for eid:', eid);
             
             // More descriptive confirmation dialog
-            const confirmMessage = `Are you sure you want to permanently delete ${doctorName}?\n\nThis action will remove all related records including:\n- Patient checkups\n- Prescriptions issued\n- Lab orders\n- Appointments\n- Reports\n\nThis action cannot be undone.`;
+            const confirmMessage = `Are you sure you want to permanently delete ${doctorName}?
+
+This action will remove all related records including:
+- Patient checkups
+- Prescriptions issued
+- Lab orders
+- Appointments
+- Reports
+
+This action cannot be undone.`;
             
             if (confirm(confirmMessage)) {
                 // Disable the button to prevent double-clicks
@@ -288,16 +297,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 payload.password = password;
             }
 
-            const url = `${contextPath}/admin/doctors/edit/${eid}`.replace(/\/{2,}/g, '/');
-            sendPostRequest(url, payload,
-                () => {
-                    if (editModal) editModal.hide();
-                    location.reload();
-                },
-                (error) => {
-                    alert('Failed to save changes: ' + error.message);
-                }
-            );
+            // Submit form via page reload to handle server-side validation errors
+            editForm.action = `${contextPath}/admin/doctors/edit/${eid}`;
+            editForm.method = 'POST';
+            editForm.submit();
         });
     }
 
@@ -369,20 +372,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmPassword: confirmPassword
             };
             
-            const url = `${contextPath}/admin/doctors/add`.replace(/\/{2,}/g, '/');
-            sendPostRequest(url, payload,
-                () => {
-                    if (addModal) addModal.hide();
-                    // Reset form
-                    addForm.reset();
-                    // Remove any validation classes
-                    addForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    location.reload();
-                },
-                (error) => {
-                    alert('Failed to add doctor: ' + error.message);
-                }
-            );
+            // Submit form via page reload to handle server-side validation errors
+            // Remove the event listener to prevent infinite loop
+            e.target.removeEventListener('submit', arguments.callee);
+            // Submit the form
+            e.target.submit();
         });
     }
 
