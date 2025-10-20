@@ -33,9 +33,8 @@ public class Patient {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "user_name")
-    private String userName;
-
+    // Removed user_name field as it's not in the schema
+    
     @Column(name = "status")
     private String status;
 
@@ -59,8 +58,7 @@ public class Patient {
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public String getUserName() { return userName; }
-    public void setUserName(String userName) { this.userName = userName; }
+    // Removed getUserName and setUserName methods
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public List<PatientPhone> getPhones() { return phones; }

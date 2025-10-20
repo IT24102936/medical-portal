@@ -46,15 +46,20 @@ public class PatientService {
                           LocalDate dob, String phone, String nationalId, String userName, 
                           String password) {
         try {
+            // Validate unique email
+            if (patientRepository.existsByEmail(email)) {
+                throw new RuntimeException("Email is already registered");
+            }
+            
             // Get next available patient ID
             Integer nextPid = patientRepository.getNextPatientId();
             
             // Encode password
             String encodedPassword = passwordEncoder.encode(password);
             
-            // Insert patient record
+            // Insert patient record (note: username is not in the schema, so we're not using it)
             patientRepository.insertPatient(nextPid, firstName, lastName, email, gender, 
-                                          dob, nationalId, userName, encodedPassword);
+                                          dob, nationalId, encodedPassword);
             
             // Insert phone number if provided
             if (phone != null && !phone.trim().isEmpty()) {
@@ -64,7 +69,7 @@ public class PatientService {
             logger.info("Successfully added new patient with pid: {}", nextPid);
         } catch (Exception e) {
             logger.error("Error adding patient: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to add patient", e);
+            throw new RuntimeException("Failed to add patient: " + e.getMessage(), e);
         }
     }
 
@@ -73,9 +78,14 @@ public class PatientService {
                             String gender, LocalDate dob, String phone, String nationalId, 
                             String userName) {
         try {
-            // Update patient basic information
+            // Validate unique email for updates
+            if (patientRepository.existsByEmailAndPatientIdNot(email, pid)) {
+                throw new RuntimeException("Email is already registered");
+            }
+            
+            // Update patient basic information (note: username is not in the schema, so we're not using it)
             patientRepository.updatePatient(pid, firstName, lastName, email, gender, 
-                                          dob, nationalId, userName);
+                                          dob, nationalId);
             
             // Update phone number if provided
             if (phone != null && !phone.trim().isEmpty()) {
@@ -88,7 +98,7 @@ public class PatientService {
             logger.info("Successfully updated patient with pid: {}", pid);
         } catch (Exception e) {
             logger.error("Error updating patient with pid {}: {}", pid, e.getMessage(), e);
-            throw new RuntimeException("Failed to update patient", e);
+            throw new RuntimeException("Failed to update patient: " + e.getMessage(), e);
         }
     }
 

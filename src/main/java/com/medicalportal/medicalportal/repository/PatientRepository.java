@@ -16,15 +16,33 @@ import java.util.Optional;
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
+    // Insert new patient
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO patient (patient_id, first_name, last_name, email, gender, dob, 
+                           national_id, password, status)
+        VALUES (:patientId, :firstName, :lastName, :email, :gender, :dob, 
+                :nationalId, :password, 'ACTIVE')
+        """, nativeQuery = true)
+    void insertPatient(@Param("patientId") Integer patientId,
+                       @Param("firstName") String firstName,
+                       @Param("lastName") String lastName,
+                       @Param("email") String email,
+                       @Param("gender") String gender,
+                       @Param("dob") LocalDate dob,
+                       @Param("nationalId") String nationalId,
+                       @Param("password") String password);
+
     // Get all patients with their phone numbers
     @Query(value = """
         SELECT p.patient_id, p.first_name, p.last_name, p.email, p.gender, p.dob, 
-               p.national_id, p.user_name, p.status,
+               p.national_id, p.status,
                GROUP_CONCAT(pp.phone_number SEPARATOR ', ') as phone_numbers
         FROM patient p
         LEFT JOIN patient_phone pp ON p.patient_id = pp.patient_id
         GROUP BY p.patient_id, p.first_name, p.last_name, p.email, p.gender, p.dob, 
-                 p.national_id, p.user_name, p.status
+                 p.national_id, p.status
         ORDER BY p.first_name, p.last_name
         """, nativeQuery = true)
     List<Map<String, Object>> findAllPatientsWithPhones();
@@ -32,13 +50,13 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     // Get patient by ID with phone numbers
     @Query(value = """
         SELECT p.patient_id, p.first_name, p.last_name, p.email, p.gender, p.dob, 
-               p.national_id, p.user_name, p.status,
+               p.national_id, p.status,
                GROUP_CONCAT(pp.phone_number SEPARATOR ', ') as phone_numbers
         FROM patient p
         LEFT JOIN patient_phone pp ON p.patient_id = pp.patient_id
         WHERE p.patient_id = :patientId
         GROUP BY p.patient_id, p.first_name, p.last_name, p.email, p.gender, p.dob, 
-                 p.national_id, p.user_name, p.status
+                 p.national_id, p.status
         """, nativeQuery = true)
     Optional<Map<String, Object>> findPatientByIdWithPhones(@Param("patientId") Integer patientId);
 
@@ -52,8 +70,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
         email = :email, 
         gender = :gender, 
         dob = :dob, 
-        national_id = :nationalId, 
-        user_name = :userName
+        national_id = :nationalId
         WHERE patient_id = :patientId
         """, nativeQuery = true)
     void updatePatient(@Param("patientId") Integer patientId,
@@ -62,8 +79,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
                        @Param("email") String email,
                        @Param("gender") String gender,
                        @Param("dob") LocalDate dob,
-                       @Param("nationalId") String nationalId,
-                       @Param("userName") String userName);
+                       @Param("nationalId") String nationalId);
 
     // Disable patient
     @Modifying
@@ -85,7 +101,7 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM appointment WHERE patient_id = :patientId", nativeQuery = true)
+    @Query(value = "DELETE FROM patient_appointment_booking WHERE patient_id = :patientId", nativeQuery = true)
     void deletePatientAppointments(@Param("patientId") Integer patientId);
 
     @Modifying
@@ -95,17 +111,17 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM patient_report WHERE patient_id = :patientId", nativeQuery = true)
+    @Query(value = "DELETE FROM medical_report WHERE patient_id = :patientId", nativeQuery = true)
     void deletePatientReports(@Param("patientId") Integer patientId);
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM prescription WHERE patient_id = :patientId", nativeQuery = true)
+    @Query(value = "DELETE FROM doctor_issues_prescription WHERE patient_id = :patientId", nativeQuery = true)
     void deletePatientPrescriptions(@Param("patientId") Integer patientId);
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM lab_order WHERE patient_id = :patientId", nativeQuery = true)
+    @Query(value = "DELETE FROM doctor_issues_lab_order WHERE patient_id = :patientId", nativeQuery = true)
     void deletePatientLabOrders(@Param("patientId") Integer patientId);
 
     // Delete patient record
@@ -113,25 +129,6 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     @Transactional
     @Query(value = "DELETE FROM patient WHERE patient_id = :patientId", nativeQuery = true)
     void deletePatientRecord(@Param("patientId") Integer patientId);
-
-    // Insert new patient
-    @Modifying
-    @Transactional
-    @Query(value = """
-        INSERT INTO patient (patient_id, first_name, last_name, email, gender, dob, 
-                           national_id, user_name, password, status)
-        VALUES (:patientId, :firstName, :lastName, :email, :gender, :dob, 
-                :nationalId, :userName, :password, 'ACTIVE')
-        """, nativeQuery = true)
-    void insertPatient(@Param("patientId") Integer patientId,
-                       @Param("firstName") String firstName,
-                       @Param("lastName") String lastName,
-                       @Param("email") String email,
-                       @Param("gender") String gender,
-                       @Param("dob") LocalDate dob,
-                       @Param("nationalId") String nationalId,
-                       @Param("userName") String userName,
-                       @Param("password") String password);
 
     // Insert phone number
     @Modifying
@@ -152,4 +149,21 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     // Get phone numbers for a patient
     @Query(value = "SELECT phone_number FROM patient_phone WHERE patient_id = :patientId", nativeQuery = true)
     List<String> getPhoneNumbersByPid(@Param("patientId") Integer patientId);
+    
+    // Check if email is already taken
+    @Query(value = "SELECT COUNT(*) FROM patient WHERE email = :email", nativeQuery = true)
+    int countByEmail(@Param("email") String email);
+    
+    // Check if email is already taken by another patient (for updates)
+    @Query(value = "SELECT COUNT(*) FROM patient WHERE email = :email AND patient_id != :patientId", nativeQuery = true)
+    int countByEmailAndPatientIdNot(@Param("email") String email, @Param("patientId") Integer patientId);
+    
+    // Helper methods to check existence
+    default boolean existsByEmail(String email) {
+        return countByEmail(email) > 0;
+    }
+    
+    default boolean existsByEmailAndPatientIdNot(String email, Integer patientId) {
+        return countByEmailAndPatientIdNot(email, patientId) > 0;
+    }
 }
