@@ -1,9 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="context-path" content="${pageContext.request.contextPath}" />
+    <meta name="_csrf" content="${_csrf.token}" />
+    <meta name="_csrf_header" content="${_csrf.headerName}" />
     <title>Medisphere - Appointments</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -33,12 +37,12 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav main-nav" style="gap: 1rem;">
-                    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#">Appointments</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Patients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Doctors</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Employees</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/appointments">Appointments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/patients">Patients</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/doctors">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/employees">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/reports">Reports</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
@@ -68,6 +72,26 @@
         <div class="container-xl">
             <h1 class="h2 fw-bold mb-4">Appointments</h1>
 
+            <!-- Error/Success Messages -->
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        ${param.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.success}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        ${param.success}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link" id="nav-past-tab" data-bs-toggle="tab" data-bs-target="#nav-past" type="button" role="tab" aria-controls="nav-past" aria-selected="false">Past</button>
@@ -85,20 +109,50 @@
                                     <thead>
                                     <tr>
                                         <th class="p-3">Doctor Name</th>
+                                        <th class="p-3">Doctor Specialization</th>
                                         <th class="p-3">Patient Name</th>
                                         <th class="p-3">Date</th>
+                                        <th class="p-3">Time</th>
                                         <th class="p-3">Status</th>
-                                        <th class="p-3"></th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td class="p-3 fw-medium">Dr. Emily White</td>
-                                        <td class="p-3 fw-medium">Sophia Clark</td>
-                                        <td class="p-3 text-muted">2025-09-15</td>
-                                        <td class="p-3"><span class="badge rounded-pill fw-medium bg-status-completed px-2 py-1">Completed</span></td>
-                                        <td class="p-3 text-end"><button class="btn btn-sm btn-outline-secondary">View Details</button></td>
-                                    </tr>
+                                    <c:choose>
+                                        <c:when test="${not empty pastAppointments}">
+                                            <c:forEach var="appointment" items="${pastAppointments}">
+                                                <tr>
+                                                    <td class="p-3 fw-medium">${appointment.doctor_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.doctor_specialization}</td>
+                                                    <td class="p-3 fw-medium">${appointment.patient_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_date}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_time_formatted}</td>
+                                                    <td class="p-3">
+                                                        <c:choose>
+                                                            <c:when test="${appointment.status == 'COMPLETED'}">
+                                                                <span class="badge bg-success">Completed</span>
+                                                            </c:when>
+                                                            <c:when test="${appointment.status == 'SCHEDULED'}">
+                                                                <span class="badge bg-warning">Scheduled</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-secondary">${appointment.status}</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="6" class="p-4 text-center text-muted">
+                                                    <div class="d-flex flex-column align-items-center gap-2">
+                                                        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">event_busy</span>
+                                                        <span>No Past Appointments Found</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
                                     </tbody>
                                 </table>
                             </div>
@@ -149,33 +203,48 @@
                                     </tr>
                                     </thead>
                                     <tbody id="upcomingAppointmentsBody">
-                                    <tr>
-                                        <td class="p-3 fw-medium">Dr. Emily White</td>
-                                        <td class="p-3 text-muted">Cardiology</td>
-                                        <td class="p-3 fw-medium">Sophia Clark</td>
-                                        <td class="p-3 text-muted">2025-09-25</td>
-                                        <td class="p-3 text-muted">10:00 AM</td>
-                                        <td class="p-3"><span class="badge rounded-pill fw-medium bg-status-scheduled px-2 py-1">Scheduled</span></td>
-                                        <td class="p-3 text-end"><button class="btn btn-sm btn-outline-danger">Cancel</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 fw-medium">Dr. James Green</td>
-                                        <td class="p-3 text-muted">Dermatology</td>
-                                        <td class="p-3 fw-medium">Ethan Bennett</td>
-                                        <td class="p-3 text-muted">2025-09-26</td>
-                                        <td class="p-3 text-muted">11:30 AM</td>
-                                        <td class="p-3"><span class="badge rounded-pill fw-medium bg-status-scheduled px-2 py-1">Scheduled</span></td>
-                                        <td class="p-3 text-end"><button class="btn btn-sm btn-outline-danger">Cancel</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-3 fw-medium">Dr. Olivia Blue</td>
-                                        <td class="p-3 text-muted">Pediatrics</td>
-                                        <td class="p-3 fw-medium">Olivia Carter</td>
-                                        <td class="p-3 text-muted">2025-10-02</td>
-                                        <td class="p-3 text-muted">09:00 AM</td>
-                                        <td class="p-3"><span class="badge rounded-pill fw-medium bg-status-scheduled px-2 py-1">Scheduled</span></td>
-                                        <td class="p-3 text-end"><button class="btn btn-sm btn-outline-danger">Cancel</button></td>
-                                    </tr>
+                                    <c:choose>
+                                        <c:when test="${not empty upcomingAppointments}">
+                                            <c:forEach var="appointment" items="${upcomingAppointments}">
+                                                <tr data-appointment-id="${appointment.appointment_id}">
+                                                    <td class="p-3 fw-medium">${appointment.doctor_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.doctor_specialization}</td>
+                                                    <td class="p-3 fw-medium">${appointment.patient_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_date}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_time_formatted}</td>
+                                                    <td class="p-3">
+                                                        <c:choose>
+                                                            <c:when test="${appointment.status == 'SCHEDULED'}">
+                                                                <span class="badge bg-primary">Scheduled</span>
+                                                            </c:when>
+                                                            <c:when test="${appointment.status == 'CONFIRMED'}">
+                                                                <span class="badge bg-success">Confirmed</span>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-secondary">${appointment.status}</span>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </td>
+                                                    <td class="p-3 text-end">
+                                                        <button class="btn btn-sm btn-outline-danger btn-cancel-appointment"
+                                                                data-appointment-id="${appointment.appointment_id}">
+                                                            Cancel
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="7" class="p-4 text-center text-muted">
+                                                    <div class="d-flex flex-column align-items-center gap-2">
+                                                        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">event_available</span>
+                                                        <span>No Upcoming Appointments Found</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
                                     </tbody>
                                 </table>
                             </div>
@@ -191,20 +260,47 @@
                                     <thead>
                                     <tr>
                                         <th class="p-3">Doctor Name</th>
+                                        <th class="p-3">Doctor Specialization</th>
                                         <th class="p-3">Patient Name</th>
                                         <th class="p-3">Original Date</th>
+                                        <th class="p-3">Original Time</th>
                                         <th class="p-3">Status</th>
                                         <th class="p-3"></th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td class="p-3 fw-medium">Dr. Benjamin Gray</td>
-                                        <td class="p-3 fw-medium">Liam Davis</td>
-                                        <td class="p-3 text-muted">2025-09-18</td>
-                                        <td class="p-3"><span class="badge rounded-pill fw-medium bg-status-canceled px-2 py-1">Canceled</span></td>
-                                        <td class="p-3 text-end"><button class="btn btn-sm btn-outline-danger">Delete</button></td>
-                                    </tr>
+                                    <c:choose>
+                                        <c:when test="${not empty canceledAppointments}">
+                                            <c:forEach var="appointment" items="${canceledAppointments}">
+                                                <tr data-appointment-id="${appointment.appointment_id}">
+                                                    <td class="p-3 fw-medium">${appointment.doctor_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.doctor_specialization}</td>
+                                                    <td class="p-3 fw-medium">${appointment.patient_name}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_date}</td>
+                                                    <td class="p-3 text-muted">${appointment.appointment_time_formatted}</td>
+                                                    <td class="p-3">
+                                                        <span class="badge bg-danger">Canceled</span>
+                                                    </td>
+                                                    <td class="p-3 text-end">
+                                                        <button class="btn btn-sm btn-outline-danger btn-delete-appointment"
+                                                                data-appointment-id="${appointment.appointment_id}">
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <tr>
+                                                <td colspan="7" class="p-4 text-center text-muted">
+                                                    <div class="d-flex flex-column align-items-center gap-2">
+                                                        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5;">event_busy</span>
+                                                        <span>No Canceled Appointments Found</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </c:otherwise>
+                                    </c:choose>
                                     </tbody>
                                 </table>
                             </div>

@@ -59,6 +59,15 @@ public class AdminService {
                            LocalDate dob, BigDecimal salary, String phone, String nationalId, String userName,
                            String status, String specialization, String password) {
         try {
+            // Validate unique fields for updates
+            if (doctorRepository.existsByUserNameAndEidNot(userName, eid)) {
+                throw new RuntimeException("Username is already taken");
+            }
+            
+            if (doctorRepository.existsByEmailAndEidNot(email, eid)) {
+                throw new RuntimeException("Email is already registered");
+            }
+            
             // Update doctor and employee information
             doctorRepository.editDoctor(eid, firstName, lastName, email, gender, dob, salary, nationalId, userName, status, specialization);
 
@@ -79,7 +88,7 @@ public class AdminService {
             logger.info("Edited doctor with eid: {}", eid);
         } catch (Exception e) {
             logger.error("Error editing doctor with eid {}: {}", eid, e.getMessage(), e);
-            throw e;
+            throw new RuntimeException("Failed to edit doctor: " + e.getMessage(), e);
         }
     }
 
@@ -119,6 +128,15 @@ public class AdminService {
                           LocalDate dob, BigDecimal salary, String phone, String nationalId,
                           String userName, String specialization, String password) {
         try {
+            // Validate unique fields
+            if (doctorRepository.existsByUserName(userName)) {
+                throw new RuntimeException("Username is already taken");
+            }
+            
+            if (doctorRepository.existsByEmail(email)) {
+                throw new RuntimeException("Email is already registered");
+            }
+            
             // Generate next employee ID
             Integer nextEid = doctorRepository.getNextEmployeeId();
             
@@ -140,7 +158,7 @@ public class AdminService {
             logger.info("Added new doctor with eid: {}", nextEid);
         } catch (Exception e) {
             logger.error("Error adding new doctor: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to add doctor", e);
+            throw new RuntimeException("Failed to add doctor: " + e.getMessage(), e);
         }
     }
 }
