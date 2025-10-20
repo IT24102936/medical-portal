@@ -283,16 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 password: editForm.elements['password'].value || ''
             };
 
-            const url = `${contextPath}/admin/employees/edit/${eid}`.replace(/\/{2,}/g, '/');
-            sendPostRequest(url, payload,
-                () => {
-                    if (editModal) editModal.hide();
-                    location.reload();
-                },
-                (error) => {
-                    alert('Failed to save changes: ' + error.message);
-                }
-            );
+            // Submit form via page reload to handle server-side validation errors
+            editForm.action = `${contextPath}/admin/employees/edit/${eid}`;
+            editForm.method = 'POST';
+            editForm.submit();
         });
     }
 
@@ -396,20 +390,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmPassword: confirmPassword
             };
             
-            const url = `${contextPath}/admin/employees/add`.replace(/\/{2,}/g, '/');
-            sendPostRequest(url, payload,
-                () => {
-                    if (addModal) addModal.hide();
-                    // Reset form
-                    addForm.reset();
-                    // Remove any validation classes
-                    addForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                    location.reload();
-                },
-                (error) => {
-                    alert('Failed to add employee: ' + error.message);
-                }
-            );
+            // Submit form via page reload to handle server-side validation errors
+            // Remove the event listener to prevent infinite loop
+            e.target.removeEventListener('submit', arguments.callee);
+            // Submit the form
+            e.target.submit();
         });
     }
 

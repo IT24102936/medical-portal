@@ -55,12 +55,12 @@
 
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav main-nav" style="gap: 1rem;">
-                    <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Appointments</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Patients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Doctors</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="#">Employees</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Reports</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/appointments">Appointments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/patients">Patients</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/doctors">Doctors</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/employees">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/reports">Reports</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
@@ -91,7 +91,6 @@
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-5">
                 <div class="mb-3 mb-sm-0">
                     <h1 class="h2 fw-bold">Staff Management</h1>
-                    <p class="text-muted">Manage all staff members except doctors</p>
                 </div>
                 <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
                     <span class="material-symbols-outlined"> add </span>
@@ -108,10 +107,22 @@
                 </div>
             </div>
 
-            <!-- Error Message Display -->
+            <!-- Error and Success Messages -->
             <c:if test="${not empty error}">
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong>Error:</strong> ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> ${param.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.success}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> ${param.success}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </c:if>
