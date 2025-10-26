@@ -52,7 +52,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="/logout">
                                     <span class="material-symbols-outlined">logout</span>
                                     Logout
                                 </a>
@@ -77,12 +77,12 @@
                         <div class="card-body">
                             <h3 class="h5 fw-bold mb-4">Report Type</h3>
                             <div class="row g-3">
-                                <div class="col-12 col-sm-6">
-                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card">
-                                        <input class="form-check-input" type="radio" name="report-type" value="user-activity" />
-                                        <span class="fw-medium">User Activity</span>
-                                    </label>
-                                </div>
+<%--                                <div class="col-12 col-sm-6">--%>
+<%--                                    <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card">--%>
+<%--                                        <input class="form-check-input" type="radio" name="report-type" value="user-activity" />--%>
+<%--                                        <span class="fw-medium">User Activity</span>--%>
+<%--                                    </label>--%>
+<%--                                </div>--%>
                                 <div class="col-12 col-sm-6">
                                     <label class="d-flex align-items-center gap-3 p-3 rounded-3 report-option-card active">
                                         <input class="form-check-input" type="radio" name="report-type" value="appointments" checked />

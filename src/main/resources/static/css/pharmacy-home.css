@@ -1,0 +1,486 @@
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;900&display=swap');
+
+/* Root variables for consistent branding */
+:root {
+    --primary-color: #13a4ec;
+    --dark-blue-text: #0d171b;
+    --success-color: #28a745;
+    --info-color: #17a2b8;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-bg: #f8fbff;
+    --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 15px 35px rgba(19, 164, 236, 0.15);
+}
+
+/* General Body Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Reusable Component Styles */
+.btn-primary, .bg-primary {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+.btn-primary:hover {
+    background-color: #0b8acb !important;
+    border-color: #0b8acb !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(19, 164, 236, 0.3);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+.btn-outline-primary:hover {
+    color: #ffffff !important;
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-dark-blue {
+    color: var(--dark-blue-text) !important;
+}
+
+/* Navbar Styles */
+.navbar-brand h2 {
+    font-weight: 700;
+}
+
+.navbar-toggler {
+    border: none;
+}
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+}
+
+/* Pharmacy Hero Section */
+.pharmacy-hero-section {
+    min-height: 80vh;
+    background: linear-gradient(135deg, #f8fbff 0%, #e8f5ff 50%, #dcf0ff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.pharmacy-hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(19, 164, 236, 0.1) 0%, transparent 70%);
+    animation: floatBackground 20s ease-in-out infinite;
+}
+
+@keyframes floatBackground {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-5%, -5%) rotate(90deg); }
+    50% { transform: translate(-10%, 5%) rotate(180deg); }
+    75% { transform: translate(5%, -10%) rotate(270deg); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Floating Elements for Pharmacy Theme */
+.floating-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.floating-pill {
+    position: absolute;
+    width: 25px;
+    height: 45px;
+    background: linear-gradient(135deg, rgba(19, 164, 236, 0.3), rgba(19, 164, 236, 0.1));
+    border-radius: 12px;
+    opacity: 0.6;
+    animation: floatPill 8s ease-in-out infinite;
+}
+
+.floating-pill:nth-child(1) {
+    top: 15%;
+    left: 10%;
+    animation-delay: -2s;
+    width: 20px;
+    height: 35px;
+}
+
+.floating-pill:nth-child(2) {
+    top: 25%;
+    right: 15%;
+    animation-delay: -4s;
+    width: 30px;
+    height: 50px;
+}
+
+.floating-pill:nth-child(3) {
+    bottom: 30%;
+    left: 8%;
+    animation-delay: -1s;
+    width: 22px;
+    height: 40px;
+}
+
+.floating-pill:nth-child(4) {
+    bottom: 15%;
+    right: 12%;
+    animation-delay: -3s;
+    width: 28px;
+    height: 48px;
+}
+
+@keyframes floatPill {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    50% { transform: translateY(-25px) rotate(10deg) scale(1.1); }
+}
+
+/* Service Sections */
+.pharmacy-services-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.pharmacy-process-section {
+    background: linear-gradient(135deg, #f8fbff 0%, #e3f2fd 100%);
+}
+
+/* Interactive Cards */
+.interactive-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid rgba(19, 164, 236, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.interactive-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(19, 164, 236, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.interactive-card:hover::before {
+    left: 100%;
+}
+
+.interactive-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--primary-color);
+}
+
+/* Feature Cards */
+.feature-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    border-radius: 20px;
+    border: 1px solid rgba(19, 164, 236, 0.1);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(19, 164, 236, 0.15) !important;
+    border-color: var(--primary-color);
+}
+
+/* Service Icons */
+.service-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-color), #0b8acb);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.service-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.service-icon .material-symbols-outlined {
+    color: white;
+    font-size: 2.2rem;
+}
+
+/* Pharmacy Image Styling */
+.pharmacy-image {
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.pharmacy-image:hover {
+    transform: scale(1.02);
+}
+
+/* Process Cards */
+.process-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s ease;
+    border: 1px solid rgba(19, 164, 236, 0.1);
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.process-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.process-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--card-shadow-hover);
+    border-color: var(--primary-color);
+}
+
+.process-number {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--primary-color), #0b8acb);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.process-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(19, 164, 236, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem auto;
+    transition: all 0.3s ease;
+}
+
+.process-icon .material-symbols-outlined {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+}
+
+.process-card:hover .process-icon {
+    background: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.process-card:hover .process-icon .material-symbols-outlined {
+    color: white;
+}
+
+/* Heading Font Weight */
+.display-3, .display-5, .display-6 {
+    font-weight: 700;
+}
+
+/* Enhanced Button Styles */
+.btn {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    border-radius: 6px;
+}
+
+/* Pulse Animation for Buttons */
+.btn-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(19, 164, 236, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(19, 164, 236, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(19, 164, 236, 0); }
+}
+
+/* Animations */
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.welcome-bounce {
+    animation: welcomeBounce 1.5s ease-out;
+}
+
+@keyframes welcomeBounce {
+    0% { transform: translateY(-30px); opacity: 0; }
+    60% { transform: translateY(10px); opacity: 0.8; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Statistics styling */
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(19, 164, 236, 0.05);
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .pharmacy-hero-section {
+        min-height: 60vh;
+        padding: 2rem 0;
+    }
+    
+    .display-3 {
+        font-size: 2.5rem;
+    }
+    
+    .floating-pill {
+        width: 20px !important;
+        height: 30px !important;
+    }
+    
+    .service-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .interactive-card {
+        padding: 1.5rem;
+    }
+    
+    .process-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .process-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .process-icon .material-symbols-outlined {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .display-3 {
+        font-size: 2rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 2rem !important;
+        font-size: 1rem !important;
+    }
+    
+    .interactive-card {
+        padding: 1rem;
+    }
+    
+    .interactive-card:hover {
+        transform: translateY(-5px) scale(1.01);
+    }
+    
+    .process-card {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Loading States */
+.loading {
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Trust indicators styling */
+.trust-indicators .d-flex {
+    transition: all 0.3s ease;
+}
+
+.trust-indicators .d-flex:hover {
+    transform: scale(1.05);
+}
+
+/* Enhanced card stacking for mobile */
+@media (max-width: 992px) {
+    .feature-card {
+        margin-bottom: 1.5rem;
+    }
+}

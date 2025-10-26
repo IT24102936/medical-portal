@@ -56,7 +56,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="/logout">
                                     <span class="material-symbols-outlined">logout</span>
                                     Logout
                                 </a>

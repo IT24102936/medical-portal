@@ -74,7 +74,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2" href="#">
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="/logout">
                                     <span class="material-symbols-outlined">logout</span>
                                     Logout
                                 </a>
@@ -192,7 +192,7 @@
                         <!-- Avatar Section -->
                         <div class="text-center mb-4">
                             <div class="doctor-avatar-large mx-auto mb-3" id="doctorAvatar">
-                                <img src="" alt="Doctor Avatar" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                                <img src="${pageContext.request.contextPath}/img/admin/doctor.png" alt="Doctor Avatar" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
                             </div>
                             <h4 class="text-muted"><b>Doctor Profile</b></h4>
                         </div>
@@ -321,7 +321,7 @@
                         <!-- Avatar Section -->
                         <div class="text-center mb-4">
                             <div class="doctor-avatar-large mx-auto mb-3">
-                                <img src="${pageContext.request.contextPath}/img/doctor.png" alt="Doctor Avatar" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                                <img src="${pageContext.request.contextPath}/img/admin/doctor.png" alt="Doctor Avatar" class="img-fluid rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
                             </div>
                             <h4 class="text-muted"><b>New Doctor Profile</b></h4>
                         </div>
